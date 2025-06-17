@@ -23,21 +23,21 @@
 // 2003/03/26 RSA   Initial implementation.
 // 2004/11/11 RSA   Added a base interfaces for BrowsePosition.
 
-using System;
-using System.Xml;
-using System.Net;
-using System.Threading;
-using System.Collections;
-using System.Globalization;
-using System.Runtime.InteropServices;
+using Newtonsoft.Json;
 using Opc;
 using Opc.Da;
 using OpcCom;
 using OpcCom.Da;
-using OpcRcw.Da;
 using OpcRcw.Comn;
+using OpcRcw.Da;
 using Serilog;
-using Newtonsoft.Json;
+using System;
+using System.Collections;
+using System.Globalization;
+using System.Net;
+using System.Runtime.InteropServices;
+using System.Threading;
+using System.Xml;
 
 namespace OpcCom.Da20
 {
@@ -404,7 +404,7 @@ namespace OpcCom.Da20
 			BrowseFilters             filters, 
 			out Opc.Da.BrowsePosition position)
 		{
-			Log.Information($"v20.Browse --- start");
+            Log.Information($"v20.Browse --- start");
 			if (filters == null) throw new ArgumentNullException("filters");	
 
 			position = null;
@@ -1061,6 +1061,7 @@ namespace OpcCom.Da20
 				// move to the specified branch for hierarchial address spaces.
 				try
 				{
+					Log.Information($"move to the specified branch for hierarchial address spaces.");
 					browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_TO, id);
 				}
 				catch
@@ -1068,7 +1069,8 @@ namespace OpcCom.Da20
 					// try to browse down instead.
 					try
 					{
-						browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_DOWN, id);
+                        Log.Information($"try to browse down instead.");
+                        browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_DOWN, id);
 					}
 					catch
 					{
@@ -1076,11 +1078,14 @@ namespace OpcCom.Da20
 						while (true)
 						{	
 							try
-							{						
-								browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_UP, String.Empty);
+							{				
+								Log.Information($"browse to root.");
+                                browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_UP, String.Empty);
 							}
-							catch
+							catch(Exception ex)
 							{
+                                Log.Information($"ex: {ex.Message}");
+                                Log.Information($"ex: {ex.StackTrace}");
 								break;
 							}
 						}
@@ -1358,6 +1363,8 @@ namespace OpcCom.Da20
 					filters, 
 					branches, 
 					namespaceType == OPCNAMESPACETYPE.OPC_NS_FLAT);
+
+				Log.Information($"enumerator: {JsonConvert.SerializeObject(enumerator)}");
 			}
 			else
 			{

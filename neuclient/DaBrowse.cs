@@ -71,6 +71,7 @@ namespace neuclient
                     {
                         var elementName = string.IsNullOrWhiteSpace(item.ItemName) ? item.Name : item.ItemName;
                         var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                        //var itemName = $"{elementName}";
 
 
                         if (!nodes.Any(x => x.Name == item.Name))
@@ -113,12 +114,15 @@ namespace neuclient
                         {
                             var elementName = string.IsNullOrWhiteSpace(element.ItemName) ? element.Name : element.ItemName;
                             var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                            //var itemName = $"{elementName}";
+
+                            //id = new Opc.ItemIdentifier(element.ItemPath, itemName);
 
                             id = new Opc.ItemIdentifier(element.ItemPath, itemName);
 
                             //Log.Information($"create Opc.ItemIdentifier end --- id.key: {id.Key}");
 
-                            _ = AllNode(server, id, nodes, itemName);
+                            _ = AllNode(server, id, nodes, elementName);
                         }
                     }
                 }
