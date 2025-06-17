@@ -871,6 +871,7 @@ namespace OpcCom.Da.Wrapper
             {
                 try
                 {
+                    Log.Information($"get current browse position.");
                     // get current browse position.
                     ItemIdentifier itemID = null;
 
@@ -881,14 +882,17 @@ namespace OpcCom.Da.Wrapper
 
                     ArrayList hits = new ArrayList();
 
+                    Log.Information($"browse for items.");
                     // browse for items.
                     Browse(itemID, dwBrowseFilterType, szFilterCriteria, vtDataTypeFilter, dwAccessRightsFilter, hits);
 
+                    Log.Information($"create enumerator.");
                     // create enumerator.
                     ppIEnumString = (IEnumString)new EnumString(hits);
                 }
                 catch (Exception e)
                 {
+                    Log.Information($"e: {e.Message}");
                     throw CreateException(e);
                 }
             }

@@ -1064,16 +1064,18 @@ namespace OpcCom.Da20
 					Log.Information($"move to the specified branch for hierarchial address spaces.");
 					browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_TO, id);
 				}
-				catch
-				{			
-					// try to browse down instead.
-					try
-					{
+				catch(Exception ex1)
+				{
+                    Log.Information($"ex: {ex1.Message}");
+                    // try to browse down instead.
+                    try
+                    {
                         Log.Information($"try to browse down instead.");
                         browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_DOWN, id);
 					}
-					catch
+					catch(Exception ex2)
 					{
+						Log.Information($"ex: {ex2.Message}");
 						// browse to root.
 						while (true)
 						{	
@@ -1085,13 +1087,13 @@ namespace OpcCom.Da20
 							catch(Exception ex)
 							{
                                 Log.Information($"ex: {ex.Message}");
-                                Log.Information($"ex: {ex.StackTrace}");
 								break;
 							}
 						}
 
-						// parse the browse path.
-						string[] paths = null;
+                        Log.Information($"parse the browse path.");
+                        // parse the browse path.
+                        string[] paths = null;
 
 						lock (m_separatorsLock)
 						{
@@ -1105,6 +1107,8 @@ namespace OpcCom.Da20
 							}
 						}
 
+						Log.Information($"paths: {JsonConvert.SerializeObject(paths)}");
+
 						// browse to correct location.
 						for (int ii = 0; ii < paths.Length; ii++)
 						{
@@ -1117,8 +1121,9 @@ namespace OpcCom.Da20
 							{
 								browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_DOWN, paths[ii]);
 							}
-							catch
+							catch(Exception ex3)
 							{
+								Log.Information($"ex3: {ex3.Message}");
 								throw new ResultIDException(ResultID.Da.E_UNKNOWN_ITEM_NAME, "Cannot browse because the server is not compliant because it does not support the BROWSE_TO function.");
 							}
 						}
@@ -1128,6 +1133,7 @@ namespace OpcCom.Da20
 
 			try
 			{
+				Log.Information($"create the enumerator.");
 				// create the enumerator.
 				IEnumString enumerator = null;
 
@@ -1138,6 +1144,8 @@ namespace OpcCom.Da20
                     browseType = OPCBROWSETYPE.OPC_FLAT;
                 }
 
+
+				Log.Information($"browser.BrowseOPCItemIDs");
 				browser.BrowseOPCItemIDs(
                     browseType,
 					(filters.ElementNameFilter != null)?filters.ElementNameFilter:"",
@@ -1145,6 +1153,7 @@ namespace OpcCom.Da20
 					0,
 					out enumerator);
 
+				Log.Information($"return the enumerator. {JsonConvert.SerializeObject(enumerator)}");
 				// return the enumerator.
 				return new EnumString(enumerator);
 			}

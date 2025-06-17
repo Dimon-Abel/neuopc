@@ -37,33 +37,11 @@ namespace neuclient
 
                 var filters = new BrowseFilters { BrowseFilter = browseFilter.all };
 
-                //try
-                //{
                 elements = server.Browse(id, filters, out BrowsePosition position);
 
-                //Log.Information($"server.Browse end --- ItemName: {JsonConvert.SerializeObject(elements.Select(x => x.ItemName).ToList())}");
-                //Log.Information($"server.Browse end --- ItemPath: {JsonConvert.SerializeObject(elements.Select(x => x.ItemPath).ToList())}");
                 Log.Information($"server.Browse end --- elements: {JsonConvert.SerializeObject(elements)}");
                 Log.Information($"server.Browse end --- position: {JsonConvert.SerializeObject(position)}");
 
-                //}
-                //catch (Exception ex)
-                //{
-                //    BrowsePosition position = new BrowsePosition(id, filters);
-                //    Log.Information($"server.Browse.Error: {ex.Message}");
-                //    elements = server.BrowseNext(ref position);
-
-                //    Log.Information($"BrowseNext --- element: {JsonConvert.SerializeObject(elements)}, position: {JsonConvert.SerializeObject(position)}");
-
-                //    if (!elements.Any())
-                //    {
-                //        var pid = new Opc.ItemIdentifier(null, parentName);
-                //        var pp = new BrowsePosition(pid, filters);
-                //        elements = server.BrowseNext(ref pp);
-
-                //        Log.Information($"BrowseNext: --- parentName: {parentName} --- elements: {JsonConvert.SerializeObject(elements)} --- pp: {JsonConvert.SerializeObject(pp)}");
-                //    }
-                //}
 
                 if (null != elements && elements.Any())
                 {
@@ -91,20 +69,6 @@ namespace neuclient
                         }
                     }
 
-                    //var list = elements
-                    //    .Select(
-                    //        x =>
-                    //            new Node
-                    //            {
-                    //                Name = x.Name,
-                    //                ItemName = x.ItemName,
-                    //                ItemPath = x.ItemPath,
-                    //                IsItem = x.IsItem
-                    //            }
-                    //    )
-                    //    .ToList();
-                    //nodes.AddRange(list);
-
                     Log.Information($"nodes.AddRange end --- nodes.count : {nodes.Count}");
 
                     foreach (var element in elements)
@@ -122,7 +86,7 @@ namespace neuclient
 
                             //Log.Information($"create Opc.ItemIdentifier end --- id.key: {id.Key}");
 
-                            _ = AllNode(server, id, nodes, elementName);
+                            _ = AllNode(server, id, nodes, itemName);
                         }
                     }
                 }
