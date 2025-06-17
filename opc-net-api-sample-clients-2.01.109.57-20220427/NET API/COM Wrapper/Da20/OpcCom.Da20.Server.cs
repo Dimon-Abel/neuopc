@@ -36,6 +36,8 @@ using OpcCom;
 using OpcCom.Da;
 using OpcRcw.Da;
 using OpcRcw.Comn;
+using Serilog;
+using Newtonsoft.Json;
 
 namespace OpcCom.Da20
 {
@@ -401,7 +403,8 @@ namespace OpcCom.Da20
 			ItemIdentifier            itemID,
 			BrowseFilters             filters, 
 			out Opc.Da.BrowsePosition position)
-		{		
+		{
+			Log.Information($"v20.Browse --- start");
 			if (filters == null) throw new ArgumentNullException("filters");	
 
 			position = null;
@@ -414,20 +417,24 @@ namespace OpcCom.Da20
 
 				ArrayList elements = new ArrayList();
 
+				Log.Information($"search for child branches.");
 				// search for child branches.
 				if (filters.BrowseFilter != browseFilter.item)
 				{
 					BrowseElement[] branches = GetElements(elements.Count, itemID, filters, true, ref pos);
-					
-					if (branches != null)
+
+                    Log.Information($"branches: {JsonConvert.SerializeObject(branches)}");
+
+                    if (branches != null)
 					{
 						elements.AddRange(branches);
 					}
 
 					position = pos;
 
-					// return current set if browse halted.
-					if (position != null)
+                    Log.Information($"return current set if browse halted.");
+                    // return current set if browse halted.
+                    if (position != null)
 					{
 						return (BrowseElement[])elements.ToArray(typeof(BrowseElement));
 					}
@@ -1303,14 +1310,19 @@ namespace OpcCom.Da20
 			ref OpcCom.Da20.BrowsePosition position)
 		{
 			// get the enumerator.
-			EnumString enumerator = null;
+			Log.Information($"get the enumerator.");
+
+            Log.Information($"GetElements -elementsFound: {elementsFound} -itemID: {JsonConvert.SerializeObject(itemID)} -filters: {JsonConvert.SerializeObject(filters)} -branches: {branches} -position: {JsonConvert.SerializeObject(position)}");
+
+            EnumString enumerator = null;
 			
 			if (position == null)
 			{
 				IOPCBrowseServerAddressSpace browser = (IOPCBrowseServerAddressSpace)m_server;
 
-				// check the server address space type.
-				OPCNAMESPACETYPE namespaceType = OPCNAMESPACETYPE.OPC_NS_HIERARCHIAL;
+                Log.Information($"check the server address space type.");
+                // check the server address space type.
+                OPCNAMESPACETYPE namespaceType = OPCNAMESPACETYPE.OPC_NS_HIERARCHIAL;
 
 				try
 				{
@@ -1321,23 +1333,27 @@ namespace OpcCom.Da20
 					throw OpcCom.Interop.CreateException("IOPCBrowseServerAddressSpace.QueryOrganization", e);
 				}
 
-				// return an empty list if requesting branches for a flat address space.
-				if (namespaceType == OPCNAMESPACETYPE.OPC_NS_FLAT)
+                Log.Information($"return an empty list if requesting branches for a flat address space.");
+				Log.Information($"namespaceType: {namespaceType}");
+                // return an empty list if requesting branches for a flat address space.
+                if (namespaceType == OPCNAMESPACETYPE.OPC_NS_FLAT)
 				{
 					if (branches)
 					{
 						return new BrowseElement[0];
-					} 
+					}
 
-					// check that root is browsed for flat address spaces.
-					if (itemID != null && itemID.ItemName != null && itemID.ItemName.Length > 0)
+                    Log.Information($"check that root is browsed for flat address spaces.");
+                    // check that root is browsed for flat address spaces.
+                    if (itemID != null && itemID.ItemName != null && itemID.ItemName.Length > 0)
 					{
 						throw new ResultIDException(ResultID.Da.E_UNKNOWN_ITEM_NAME);
 					}
 				}
 
-				// get the enumerator.
-				enumerator = GetEnumerator(
+                Log.Information($"get the enumerator.");
+                // get the enumerator.
+                enumerator = GetEnumerator(
 					(itemID != null)?itemID.ItemName:null, 
 					filters, 
 					branches, 
@@ -1350,14 +1366,16 @@ namespace OpcCom.Da20
 
 			ArrayList elements = new ArrayList();
 
-			// read elements one at a time.
-			BrowseElement element = null;
+            Log.Information($"read elements one at a time.");
+            // read elements one at a time.
+            BrowseElement element = null;
 
 			int start = 0;
 			string[] names = null;
 
-			// get cached name list.
-			if (position != null)
+            Log.Information($"get cached name list.");
+            // get cached name list.
+            if (position != null)
 			{
 				start = position.Index;
 				names = position.Names;
@@ -1370,8 +1388,9 @@ namespace OpcCom.Da20
 				{
 					for (int ii = start; ii < names.Length; ii++)
 					{
-						// check if max returned elements is exceeded.
-						if (filters.MaxElementsReturned != 0 && filters.MaxElementsReturned == elements.Count+elementsFound)
+                        Log.Information($"check if max returned elements is exceeded.");
+                        // check if max returned elements is exceeded.
+                        if (filters.MaxElementsReturned != 0 && filters.MaxElementsReturned == elements.Count+elementsFound)
 						{
 							position = new OpcCom.Da20.BrowsePosition(itemID, filters, enumerator, branches);
 							position.Names = names;
@@ -1379,9 +1398,12 @@ namespace OpcCom.Da20
 							break;
 						}
 
-						// get next element.
-						element = GetElement(itemID, names[ii], filters, branches);
-						
+                        Log.Information($"get next element.");
+                        // get next element.
+                        element = GetElement(itemID, names[ii], filters, branches);
+
+						Log.Information($"element: {JsonConvert.SerializeObject(element)}");
+
 						if (element == null)
 						{
 							break;
@@ -1392,14 +1414,17 @@ namespace OpcCom.Da20
 					}
 				}
 
-				// check if browse halted.
-				if (position != null)
+                Log.Information($"check if browse halted. elements: {JsonConvert.SerializeObject(elements)}");
+
+                // check if browse halted.
+                if (position != null)
 				{
 					break;
 				}
 
-				// fetch next element name.
-				names = enumerator.Next(10);
+                Log.Information($"fetch next element names.: {JsonConvert.SerializeObject(names)}");
+                // fetch next element name.
+                names = enumerator.Next(10);
 				start = 0;
 			}
 			while (names != null && names.Length > 0);

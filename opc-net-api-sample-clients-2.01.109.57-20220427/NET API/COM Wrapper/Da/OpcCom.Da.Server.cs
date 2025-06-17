@@ -35,6 +35,8 @@ using Opc;
 using Opc.Da;
 using OpcRcw.Da;
 using OpcRcw.Comn;
+using Serilog;
+using Newtonsoft.Json;
 
 namespace OpcCom.Da
 {
@@ -547,7 +549,9 @@ namespace OpcCom.Da
 			ItemIdentifier            itemID,
 			BrowseFilters             filters, 
 			out Opc.Da.BrowsePosition position)
-		{		
+		{
+			Log.Information($"Browse --- start");
+
 			if (filters == null) throw new ArgumentNullException("filters");	
 
 			lock (this)
@@ -566,6 +570,7 @@ namespace OpcCom.Da
 				// invoke COM method.
 				try
 				{
+
 					((IOPCBrowse)m_server).Browse(
 						(itemID != null && itemID.ItemName != null)?itemID.ItemName:"",
 						ref pContinuationPoint,
@@ -584,10 +589,14 @@ namespace OpcCom.Da
 				catch (Exception e)
 				{
 					throw OpcCom.Interop.CreateException("IOPCBrowse.Browse", e);
-				}		
+				}
+
+				Log.Information($"pElements: {JsonConvert.SerializeObject(pElements)}");
 
 				// unmarshal results.
 				BrowseElement[] elements = OpcCom.Da.Interop.GetBrowseElements(ref pElements, count, true);
+
+				Log.Information($"BrowseElement[] elements: {JsonConvert.SerializeObject(elements)}");
 
 				string continuationPoint = Marshal.PtrToStringUni(pContinuationPoint);
 				Marshal.FreeCoTaskMem(pContinuationPoint);

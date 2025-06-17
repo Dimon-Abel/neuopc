@@ -38,6 +38,8 @@ using Opc.Da;
 using OpcCom.Da;
 using OpcRcw.Da;
 using OpcRcw.Comn;
+using Serilog;
+using Newtonsoft.Json;
 
 namespace OpcCom.Da.Wrapper
 {	
@@ -522,7 +524,9 @@ namespace OpcCom.Da.Wrapper
 					filters.ReturnPropertyValues = bReturnPropertyValues != 0;
 					filters.PropertyIDs          = Interop.GetPropertyIDs(pdwPropertyIDs);
 
-					Opc.Da.BrowsePosition  position = null;
+                    Log.Information($"Browse.filters: {JsonConvert.SerializeObject(filters)}");
+
+                    Opc.Da.BrowsePosition  position = null;
 					Opc.Da.BrowseElement[] elements = null;
 
 					// unmarhshal continuation point.
@@ -566,6 +570,8 @@ namespace OpcCom.Da.Wrapper
 
 						// fetch next set of elements.
 						elements = m_server.BrowseNext(ref position);
+
+						Log.Information($"m_server.BrowseNext：{JsonConvert.SerializeObject(elements)}");
 					}
 
 					// clear any expired continuation points.

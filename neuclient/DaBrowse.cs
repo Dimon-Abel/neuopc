@@ -13,7 +13,7 @@ namespace neuclient
 {
     public class DaBrowse
     {
-        public static Dictionary<string, int> _map = new Dictionary<string, int>();
+        public static List<Node> allNodes = new List<Node>();
 
         public static IEnumerable<Node> AllNode(
             Server server,
@@ -67,33 +67,42 @@ namespace neuclient
 
                 if (null != elements && elements.Any())
                 {
-                    //foreach (var item in elements)
-                    //{
-                    //    var elementName = string.IsNullOrWhiteSpace(item.ItemName) ? item.Name : item.ItemName;
-                    //    var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                    foreach (var item in elements)
+                    {
+                        var elementName = string.IsNullOrWhiteSpace(item.ItemName) ? item.Name : item.ItemName;
+                        var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
 
-                    //    nodes.Add(new Node()
-                    //    {
-                    //        Name = item.Name,
-                    //        ItemName = itemName,
-                    //        ItemPath = item.ItemPath,
-                    //        IsItem = item.IsItem
-                    //    });
-                    //}
 
-                    var list = elements
-                        .Select(
-                            x =>
-                                new Node
-                                {
-                                    Name = x.Name,
-                                    ItemName = x.ItemName,
-                                    ItemPath = x.ItemPath,
-                                    IsItem = x.IsItem
-                                }
-                        )
-                        .ToList();
-                    nodes.AddRange(list);
+                        if (!nodes.Any(x => x.Name == item.Name))
+                        {
+                            var node = new Node()
+                            {
+                                Name = item.Name,
+                                ItemName = itemName,
+                                ItemPath = item.ItemPath,
+                                IsItem = item.IsItem
+                            };
+
+                            nodes.Add(node);
+
+                            Log.Information($"node: {JsonConvert.SerializeObject(node)}");
+
+                        }
+                    }
+
+                    //var list = elements
+                    //    .Select(
+                    //        x =>
+                    //            new Node
+                    //            {
+                    //                Name = x.Name,
+                    //                ItemName = x.ItemName,
+                    //                ItemPath = x.ItemPath,
+                    //                IsItem = x.IsItem
+                    //            }
+                    //    )
+                    //    .ToList();
+                    //nodes.AddRange(list);
 
                     Log.Information($"nodes.AddRange end --- nodes.count : {nodes.Count}");
 
@@ -102,12 +111,14 @@ namespace neuclient
 
                         if (element.HasChildren)
                         {
+                            var elementName = string.IsNullOrWhiteSpace(element.ItemName) ? element.Name : element.ItemName;
+                            var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
 
-                            id = new Opc.ItemIdentifier(element.ItemPath, element.ItemName);
+                            id = new Opc.ItemIdentifier(element.ItemPath, itemName);
 
                             //Log.Information($"create Opc.ItemIdentifier end --- id.key: {id.Key}");
 
-                            _ = DaBrowse.AllNode(server, id, nodes, element.ItemName);
+                            _ = AllNode(server, id, nodes, itemName);
                         }
                     }
                 }
