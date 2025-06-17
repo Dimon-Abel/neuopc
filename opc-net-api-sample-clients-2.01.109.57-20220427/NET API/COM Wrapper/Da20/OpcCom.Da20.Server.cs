@@ -1124,7 +1124,8 @@ namespace OpcCom.Da20
 							catch(Exception ex3)
 							{
 								Log.Information($"ex3: {ex3.Message}");
-								throw new ResultIDException(ResultID.Da.E_UNKNOWN_ITEM_NAME, "Cannot browse because the server is not compliant because it does not support the BROWSE_TO function.");
+								flat = true;
+								//throw new ResultIDException(ResultID.Da.E_UNKNOWN_ITEM_NAME, "Cannot browse because the server is not compliant because it does not support the BROWSE_TO function.");
 							}
 						}
 					}
@@ -1366,7 +1367,8 @@ namespace OpcCom.Da20
 				}
 
                 Log.Information($"get the enumerator.");
-                // get the enumerator.
+
+				// get the enumerator.
                 enumerator = GetEnumerator(
 					(itemID != null)?itemID.ItemName:null, 
 					filters, 

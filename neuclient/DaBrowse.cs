@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Opc.Da;
+using OpcRcw.Da;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -13,7 +14,7 @@ namespace neuclient
 {
     public class DaBrowse
     {
-        public static List<Node> allNodes = new List<Node>();
+        public static List<BrowseElement> allElements = new List<BrowseElement>();
 
         public static IEnumerable<Node> AllNode(
             Server server,
@@ -29,6 +30,8 @@ namespace neuclient
 
             try
             {
+                Log.Information($"ShowBranches");
+
                 if (null == nodes)
                 {
                     nodes = new List<Node>();
@@ -73,6 +76,12 @@ namespace neuclient
 
                     foreach (var element in elements)
                     {
+                        if (allElements.Any(x=>x.Name == element.Name))
+                        {
+                            continue;
+                        }
+
+                        allElements.Add(element);
 
                         if (element.HasChildren)
                         {
