@@ -35,7 +35,7 @@ using Opc;
 using Opc.Da;
 using OpcRcw.Da;
 using OpcRcw.Comn;
-//using Serilog;
+using Serilog;
 //using Newtonsoft.Json;
 
 namespace OpcCom.Da

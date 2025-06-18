@@ -3933,7 +3933,8 @@ namespace OpcCom.Da.Wrapper
                 }
                 catch (Exception e)
                 {
-                    throw Server.CreateException(e);
+                    throw e;
+                    //throw Server.CreateException(e);
                 }
             }
         }

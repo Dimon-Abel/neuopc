@@ -101,7 +101,7 @@ namespace neuclient
                 Log.Error(ex.StackTrace, "DaBrowse.AllNode.Error");
             }
 
-            Log.Information($"DaBrowse.AllNode.end --- nodes: {JsonConvert.SerializeObject(nodes)}");
+            //Log.Information($"DaBrowse.AllNode.end --- nodes: {JsonConvert.SerializeObject(nodes)}");
 
             return nodes;
         }

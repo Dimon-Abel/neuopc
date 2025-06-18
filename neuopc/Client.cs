@@ -108,7 +108,9 @@ namespace neuopc
 
             for (int i = 0; i < times; i++)
             {
-                var nodes = _infoMap.Values.Where(x => !x.Subscribed).Skip(i * 1).Take(1);
+                //var nodes = _infoMap.Values.Where(x => !x.Subscribed).Skip(i * 1).Take(1);
+
+                var nodes = _infoMap.Values;
                 var tags = nodes?.Select(n => n.Node.ItemName).ToList();
                 if (null == tags || 0 >= tags.Count)
                 {
@@ -157,8 +159,6 @@ namespace neuopc
                     list.Add(it);
                 }
 
-                //Log.Information($"_dataChannel.Writer.TryWrite.list: {JsonConvert.SerializeObject(list)}");
-
                 _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
             }
 
@@ -172,13 +172,19 @@ namespace neuopc
             int count = _infoMap.Count;
             int times = count / MaxReadCount + ((count % MaxReadCount) == 0 ? 0 : 1);
 
+            Log.Information($"times: {times}");
+
             for (int i = 0; i < times; i++)
             {
                 var nodes = _infoMap.Values
                     .Where(x => !x.Subscribed)
                     .Skip(i * MaxReadCount)
                     .Take(MaxReadCount);
+
                 var tags = nodes?.Select(n => n.Node.ItemName).ToList();
+
+                Log.Information($"tags --- : {JsonConvert.SerializeObject(tags)}");
+
                 if (null == tags || 0 >= tags.Count)
                 {
                     continue;
@@ -188,6 +194,8 @@ namespace neuopc
                     tags,
                     (dic, stop) =>
                     {
+                        Log.Information($"_clientRunning: {_clientRunning}");
+
                         if (false == _clientRunning)
                         {
                             stop();

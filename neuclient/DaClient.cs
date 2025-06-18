@@ -9,12 +9,13 @@ using System.Net;
 using Opc;
 using neulib;
 using Serilog;
+using Newtonsoft.Json;
 
 namespace neuclient
 {
     public class DaClient
     {
-        private const int DefaultMonitorInterval = 100;
+        private const int DefaultMonitorInterval = 1000;
 
         private readonly URL _url;
 
@@ -170,6 +171,8 @@ namespace neuclient
         {
             tags = tags?.Distinct().ToArray() ?? new string[0];
 
+            Log.Information($"DaClient.read: {JsonConvert.SerializeObject(tags)}");
+
             if (!tags.Any())
             {
                 return new Dictionary<string, ReadItem>();
@@ -253,10 +256,17 @@ namespace neuclient
                 UpdateRate = MonitorInterval ?? DefaultMonitorInterval
             };
 
+            Log.Information($"subItem: {JsonConvert.SerializeObject(subItem)}");
+
             var sub = _server.CreateSubscription(subItem);
+
+            Log.Information($"sub: {JsonConvert.SerializeObject(sub)}");
+
             void unsubscribe() => new Thread(o => _server.CancelSubscription(sub)).Start();
             sub.DataChanged += (handle, requestHandle, values) =>
             {
+                Log.Information($"DataChanged --- start");
+
                 var monitorItem = new ReadItem()
                 {
                     Value = values[0].Value,
@@ -331,7 +341,6 @@ namespace neuclient
                 UpdateRate = MonitorInterval ?? DefaultMonitorInterval
             };
 
-            Log.Information($"_server.CreateSubscription  --- start");
             var sub = _server.CreateSubscription(subItem);
             void unsubscribe() =>
                 new Thread(o =>
@@ -347,38 +356,46 @@ namespace neuclient
                 }).Start();
 
             IDictionary<string, ReadItem> readEvents = new ConcurrentDictionary<string, ReadItem>();
-            sub.DataChanged += (handle, requestHandle, values) =>
+            try
             {
-                foreach (Opc.Da.ItemValueResult itemValueResult in values)
+                sub.DataChanged += (handle, requestHandle, values) =>
                 {
-                    var monitorItem = new ReadItem()
+                    foreach (Opc.Da.ItemValueResult itemValueResult in values)
                     {
-                        Value = itemValueResult.Value,
-                        SourceTimestamp = itemValueResult.Timestamp,
-                        ServerTimestamp = itemValueResult.Timestamp
-                    };
+                        var monitorItem = new ReadItem()
+                        {
+                            Value = itemValueResult.Value,
+                            SourceTimestamp = itemValueResult.Timestamp,
+                            ServerTimestamp = itemValueResult.Timestamp
+                        };
 
-                    if (values[0].Quality == Opc.Da.Quality.Good)
-                    {
-                        monitorItem.Quality = Quality.Good;
-                    }
-                    else
-                    {
-                        monitorItem.Quality = (Quality)values[0].Quality.QualityBits;
-                    }
+                        if (values[0].Quality == Opc.Da.Quality.Good)
+                        {
+                            monitorItem.Quality = Quality.Good;
+                        }
+                        else
+                        {
+                            monitorItem.Quality = (Quality)values[0].Quality.QualityBits;
+                        }
 
-                    string tag = itemValueResult.ItemName.ToString();
-                    if (readEvents.ContainsKey(tag))
-                    {
-                        readEvents[tag] = monitorItem;
+                        string tag = itemValueResult.ItemName.ToString();
+                        if (readEvents.ContainsKey(tag))
+                        {
+                            readEvents[tag] = monitorItem;
+                        }
+                        else
+                        {
+                            readEvents.Add(tag, monitorItem);
+                        }
                     }
-                    else
-                    {
-                        readEvents.Add(tag, monitorItem);
-                    }
-                }
-                callback(readEvents, (Action)unsubscribe);
-            };
+                    callback(readEvents, (Action)unsubscribe);
+                };
+            }
+            catch (Exception ex)
+            {
+                Log.Information($"DataChanged+ --- ex: {ex.Message}");
+                Log.Information($"DataChanged+ --- ex: {ex.StackTrace}");
+            }
 
             sub.AddItems(tags.Select(tag => new Opc.Da.Item { ItemName = tag }).ToArray());
 
