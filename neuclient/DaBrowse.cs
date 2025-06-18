@@ -51,8 +51,8 @@ namespace neuclient
                     foreach (var item in elements)
                     {
                         var elementName = string.IsNullOrWhiteSpace(item.ItemName) ? item.Name : item.ItemName;
-                        var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
-                        //var itemName = $"{elementName}";
+                        //var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                        var itemName = $"{elementName}";
 
 
                         if (!nodes.Any(x => x.Name == item.Name))
@@ -86,8 +86,8 @@ namespace neuclient
                         if (element.HasChildren)
                         {
                             var elementName = string.IsNullOrWhiteSpace(element.ItemName) ? element.Name : element.ItemName;
-                            var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
-                            //var itemName = $"{elementName}";
+                            //var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                            var itemName = $"{elementName}";
 
                             //id = new Opc.ItemIdentifier(element.ItemPath, itemName);
 
