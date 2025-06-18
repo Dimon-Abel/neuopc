@@ -35,8 +35,8 @@ using Opc;
 using Opc.Da;
 using OpcRcw.Da;
 using OpcRcw.Comn;
-using Serilog;
-using Newtonsoft.Json;
+//using Serilog;
+//using Newtonsoft.Json;
 
 namespace OpcCom.Da
 {
@@ -550,7 +550,7 @@ namespace OpcCom.Da
 			BrowseFilters             filters, 
 			out Opc.Da.BrowsePosition position)
 		{
-			Log.Information($"Browse --- start");
+			//Log.Information($"Browse --- start");
 
 			if (filters == null) throw new ArgumentNullException("filters");	
 
@@ -591,12 +591,12 @@ namespace OpcCom.Da
 					throw OpcCom.Interop.CreateException("IOPCBrowse.Browse", e);
 				}
 
-				Log.Information($"pElements: {JsonConvert.SerializeObject(pElements)}");
+				//Log.Information($"pElements: {JsonConvert.SerializeObject(pElements)}");
 
 				// unmarshal results.
 				BrowseElement[] elements = OpcCom.Da.Interop.GetBrowseElements(ref pElements, count, true);
 
-				Log.Information($"BrowseElement[] elements: {JsonConvert.SerializeObject(elements)}");
+				//Log.Information($"BrowseElement[] elements: {JsonConvert.SerializeObject(elements)}");
 
 				string continuationPoint = Marshal.PtrToStringUni(pContinuationPoint);
 				Marshal.FreeCoTaskMem(pContinuationPoint);

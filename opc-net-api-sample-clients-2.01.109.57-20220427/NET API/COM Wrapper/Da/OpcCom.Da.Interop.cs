@@ -33,6 +33,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using Opc;
 using Opc.Da;
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace OpcCom.Da
 {
@@ -789,7 +790,7 @@ namespace OpcCom.Da
 		/// <summary>
 		/// Unmarshals and deallocates a OPCITEMSTATE structures.
 		/// </summary>
-		internal static ItemValue[] GetItemValues(ref IntPtr pInput, int count, bool deallocate)
+		public static ItemValue[] GetItemValues(ref IntPtr pInput, int count, bool deallocate)
 		{
 			ItemValue[] output = null;
 			

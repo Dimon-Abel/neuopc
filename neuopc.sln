@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OPC COM RCW (Net40)", "opc-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OPC NET COM Wrapper (Net40)", "opc-net-api-sample-clients-2.01.109.57-20220427\NET API\COM Wrapper\OPC NET COM Wrapper (Net40).csproj", "{170A5455-A090-4F26-810F-15F71BBF87E6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsApp1", "WinFormsApp1\WinFormsApp1.csproj", "{BC23A0B7-FE04-4B69-8966-6E586E601F1D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,14 @@ Global
 		{170A5455-A090-4F26-810F-15F71BBF87E6}.Release|Any CPU.Build.0 = Release|Any CPU
 		{170A5455-A090-4F26-810F-15F71BBF87E6}.Release|x86.ActiveCfg = Release|Any CPU
 		{170A5455-A090-4F26-810F-15F71BBF87E6}.Release|x86.Build.0 = Release|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Debug|x86.Build.0 = Debug|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|x86.ActiveCfg = Release|Any CPU
+		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

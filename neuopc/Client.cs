@@ -89,7 +89,7 @@ namespace neuopc
                 }
 
                 Log.Information($"UpdateNodeMap end --- _infoMap.Count: {_infoMap.Count}");
-                Log.Information($"UpdateNodeMap end --- _infoMap: { JsonConvert.SerializeObject(_infoMap)}");
+                //Log.Information($"UpdateNodeMap end --- _infoMap: { JsonConvert.SerializeObject(_infoMap)}");
             }
             catch (Exception ex)
             {
@@ -157,7 +157,7 @@ namespace neuopc
                     list.Add(it);
                 }
 
-                Log.Information($"_dataChannel.Writer.TryWrite.list: {JsonConvert.SerializeObject(list)}");
+                //Log.Information($"_dataChannel.Writer.TryWrite.list: {JsonConvert.SerializeObject(list)}");
 
                 _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
             }

@@ -24,6 +24,16 @@ namespace neuopc
 
             try
             {
+                IntPtr pValues = IntPtr.Zero;
+                var values = OpcCom.Da.Interop.GetItemValues(ref pValues, 100, true);
+            }
+            catch (Exception ex)
+            {
+
+            }
+
+            try
+            {
                 Application.Run(new MainForm());
             }
             catch (Exception ex)

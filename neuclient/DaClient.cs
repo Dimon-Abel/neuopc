@@ -8,6 +8,7 @@ using System.Globalization;
 using System.Net;
 using Opc;
 using neulib;
+using Serilog;
 
 namespace neuclient
 {
@@ -186,6 +187,8 @@ namespace neuclient
             Opc.Da.ItemValueResult[] results = null;
             try
             {
+                Log.Information($"_server.Read -- start");
+
                 results = _server.Read(items.ToArray());
             }
             catch (NotConnectedException)
@@ -328,6 +331,7 @@ namespace neuclient
                 UpdateRate = MonitorInterval ?? DefaultMonitorInterval
             };
 
+            Log.Information($"_server.CreateSubscription  --- start");
             var sub = _server.CreateSubscription(subItem);
             void unsubscribe() =>
                 new Thread(o =>

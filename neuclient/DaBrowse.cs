@@ -24,14 +24,12 @@ namespace neuclient
         )
         {
 
-            Log.Information($"DaBrowse.AllNode --- start  parentName: {parentName}");
+            //Log.Information($"DaBrowse.AllNode --- start  parentName: {parentName}");
 
             BrowseElement[] elements;
 
             try
             {
-                Log.Information($"ShowBranches");
-
                 if (null == nodes)
                 {
                     nodes = new List<Node>();
@@ -42,17 +40,15 @@ namespace neuclient
 
                 elements = server.Browse(id, filters, out BrowsePosition position);
 
-                Log.Information($"server.Browse end --- elements: {JsonConvert.SerializeObject(elements)}");
-                Log.Information($"server.Browse end --- position: {JsonConvert.SerializeObject(position)}");
-
+                //Log.Information($"AllNode.server.Browse end --- elements: {JsonConvert.SerializeObject(elements)}");
 
                 if (null != elements && elements.Any())
                 {
                     foreach (var item in elements)
                     {
                         var elementName = string.IsNullOrWhiteSpace(item.ItemName) ? item.Name : item.ItemName;
-                        var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
-                        //var itemName = $"{elementName}";
+                        //var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                        var itemName = $"{elementName}";
 
 
                         if (!nodes.Any(x => x.Name == item.Name))
@@ -67,12 +63,12 @@ namespace neuclient
 
                             nodes.Add(node);
 
-                            Log.Information($"node: {JsonConvert.SerializeObject(node)}");
+                            //Log.Information($"node: {JsonConvert.SerializeObject(node)}");
 
                         }
                     }
 
-                    Log.Information($"nodes.AddRange end --- nodes.count : {nodes.Count}");
+                    //Log.Information($"nodes.AddRange end --- nodes.count : {nodes.Count}");
 
                     foreach (var element in elements)
                     {
@@ -86,8 +82,8 @@ namespace neuclient
                         if (element.HasChildren)
                         {
                             var elementName = string.IsNullOrWhiteSpace(element.ItemName) ? element.Name : element.ItemName;
-                            var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
-                            //var itemName = $"{elementName}";
+                            //var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
+                            var itemName = $"{elementName}";
 
                             //id = new Opc.ItemIdentifier(element.ItemPath, itemName);
 
