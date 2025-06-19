@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OPC NET COM Wrapper (Net40)
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsApp1", "WinFormsApp1\WinFormsApp1.csproj", "{BC23A0B7-FE04-4B69-8966-6E586E601F1D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RPCDemo", "RPCDemo\RPCDemo.csproj", "{65D7B10A-076F-491F-941E-3D2E5DD20FC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -121,6 +123,14 @@ Global
 		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|x86.ActiveCfg = Release|Any CPU
 		{BC23A0B7-FE04-4B69-8966-6E586E601F1D}.Release|x86.Build.0 = Release|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Debug|x86.Build.0 = Debug|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Release|x86.ActiveCfg = Release|Any CPU
+		{65D7B10A-076F-491F-941E-3D2E5DD20FC7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

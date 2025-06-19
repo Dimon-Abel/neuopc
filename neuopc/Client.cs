@@ -27,12 +27,15 @@ namespace neuopc
 
     internal class Client
     {
-        private static readonly int MaxReadCount = 100;
+        private static readonly int MaxReadCount = 500;
         private static DaClient _client = null;
         private static bool _clientRunning = false;
+        private static bool _momitor = true;
+        private static int _sleepTime = 1000;
         private static Thread _clientThread = null;
         private static Dictionary<string, NodeInfo> _infoMap = null;
         private static Channel<Msg> _dataChannel = null;
+        private static Action<IEnumerable<NodeInfo>> _action;
 
         public static IEnumerable<Node> AllItemNode(Opc.Da.Server server)
         {
@@ -108,9 +111,13 @@ namespace neuopc
 
             for (int i = 0; i < times; i++)
             {
-                //var nodes = _infoMap.Values.Where(x => !x.Subscribed).Skip(i * 1).Take(1);
+                //Log.Information($"ReadTags._momitor: {_momitor}");
 
-                var nodes = _infoMap.Values;
+                var nodes = _momitor ?
+                    _infoMap.Values.Where(x => !x.Subscribed).Skip(i * 1).Take(1) :
+                    _infoMap.Values.Skip(i * 1).Take(MaxReadCount);
+
+                //var nodes = _infoMap.Values;
                 var tags = nodes?.Select(n => n.Node.ItemName).ToList();
                 if (null == tags || 0 >= tags.Count)
                 {
@@ -162,11 +169,23 @@ namespace neuopc
                 _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
             }
 
+            Log.Information($"_action: {_action?.GetHashCode()}");
+
+            if (_action != null)
+            {
+                _action(GetNodes());
+            }
+
             Log.Information("ReadTags end");
         }
 
         private static void MonitorTags()
         {
+            if (!_momitor)
+            {
+                return;
+            }
+
             Log.Information($"MonitorTags start");
 
             int count = _infoMap.Count;
@@ -233,6 +252,7 @@ namespace neuopc
         {
             while (_clientRunning)
             {
+                Log.Information($"ClientThread --- start");
                 try
                 {
                     _client.Connect();
@@ -271,7 +291,9 @@ namespace neuopc
                     Log.Error(ex, "monitor tags failed");
                 }
 
-                Thread.Sleep(1000);
+                Log.Information($"ClientThread --- end");
+
+                Thread.Sleep(_sleepTime);
             }
         }
 
@@ -375,7 +397,7 @@ namespace neuopc
             }
         }
 
-        public static void Start(string serverUrl, Channel<Msg> dataChannel)
+        public static void Start(string serverUrl, Channel<Msg> dataChannel, int? monitorTime, Action<IEnumerable<NodeInfo>> action = null)
         {
             try
             {
@@ -383,6 +405,19 @@ namespace neuopc
                 {
                     return;
                 }
+
+                if (monitorTime.HasValue)
+                {
+                    _momitor = false;
+                    _sleepTime = monitorTime.Value;
+                }
+
+                if (action != null)
+                {
+                    _action = action;
+                }
+
+                Log.Information($"_momitor: {_momitor}");
 
                 _client = new DaClient(serverUrl, string.Empty, string.Empty, string.Empty);
                 _clientRunning = true;

@@ -15,7 +15,7 @@ namespace neuclient
 {
     public class DaClient
     {
-        private const int DefaultMonitorInterval = 1000;
+        private const int DefaultMonitorInterval = 3000;
 
         private readonly URL _url;
 
@@ -42,8 +42,8 @@ namespace neuclient
                 throw;
             }
 
-            _user = user;
-            _password = password;
+            _user = "administrator";
+            _password = "TJ@ihistorian2017";
             _domain = domain;
         }
 
@@ -65,14 +65,19 @@ namespace neuclient
 
             _server = new Opc.Da.Server(new OpcCom.Factory(), _url);
 
+            Log.Information($"_user: {_user},_password: {_password},_domain: {_domain}");
+
             if (!string.IsNullOrEmpty(_user))
             {
                 var credential = DaServer.GetNetCredential(_user, _password, _domain);
                 var connectData = DaServer.GetConnectData(credential, _proxy);
                 _server.Connect(connectData);
             }
+            else
+            {
+                _server.Connect();
+            }
 
-            _server.Connect();
             Status = ServerStatus.Connected;
         }
 
@@ -171,7 +176,7 @@ namespace neuclient
         {
             tags = tags?.Distinct().ToArray() ?? new string[0];
 
-            Log.Information($"DaClient.read: {JsonConvert.SerializeObject(tags)}");
+            //Log.Information($"DaClient.read: {JsonConvert.SerializeObject(tags)}");
 
             if (!tags.Any())
             {

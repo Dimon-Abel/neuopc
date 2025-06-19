@@ -1,3 +1,12 @@
+using System;
+using System.ComponentModel;
+using System.DirectoryServices.ActiveDirectory;
+using System.Net;
+using System.Security.Policy;
+using Microsoft.VisualBasic.ApplicationServices;
+using Opc;
+using OpcRcw.Da;
+
 namespace WinFormsApp1
 {
     internal static class Program
@@ -11,16 +20,14 @@ namespace WinFormsApp1
             // To customize application configuration such as set high DPI settings or default font,
             // see https://aka.ms/applicationconfiguration.
             ApplicationConfiguration.Initialize();
+            //var _url = new URL("opcda://192.168.20.102/pSafetyLink.OPCServer/{333517ba-2832-43ee-a2ea-8a3fa7d27749}\r\n");
+            //var _server = new Opc.Da.Server(new OpcCom.Factory(), _url);
 
-            try
-            {
-                IntPtr pValues = IntPtr.Zero;
-                var values = OpcCom.Da.Interop.GetItemValues(ref pValues, 100, true);
-            }
-            catch (Exception ex)
-            {
+            //var credential = new NetworkCredential("admin", password, domain);
+            //var connectData = new ConnectData(credential, null);
+            //_server.Connect(connectData);
 
-            }
+
 
             Application.Run(new Form1());
         }

@@ -238,11 +238,14 @@ namespace neuopc
 
         private void TestButton_Click(object sender, EventArgs e)
         {
+
             DALabel.Text = string.Empty;
             var uri = DAServerComboBox.Text;
             var user = string.Empty;
             var password = string.Empty;
             var domain = string.Empty;
+
+            //Demo.Test(uri);
 
             DaClient client;
             try
@@ -278,7 +281,16 @@ namespace neuopc
                     Server.Start(url, user, password, Client.WriteTag);
 
                     var uri = DAServerComboBox.Text;
-                    Client.Start(uri, Server.DataChannel);
+
+                    int time = 1500;
+                    //var intervalTime = IntervalTime.Text;
+                    //if (int.TryParse(intervalTime, out int result))
+                    //{
+                    //    time
+                    //}
+
+
+                    Client.Start(uri, Server.DataChannel, time, RefreshListView);
 
                     SwitchButton.Text = "Stop";
                     DAHostComboBox.Enabled = false;
@@ -307,7 +319,7 @@ namespace neuopc
                     Log.Information($"da server {uri} server stopped");
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Error($"SwitchButton_Click: {ex.StackTrace}");
             }
@@ -328,6 +340,69 @@ namespace neuopc
             };
 
             ConfigUtil.SaveConfig("neuopc.json", config);
+        }
+
+        private void RefreshListView(IEnumerable<NodeInfo> nodes)
+        {
+            Action<IEnumerable<NodeInfo>> action = (data) =>
+            {
+                var items = MainListView.Items;
+
+                if (items.Count > 0)
+                {
+                    MainListView.Items.Clear();
+                }
+
+                foreach (var info in data)
+                {
+                    MainListView.BeginUpdate();
+                    ListViewItem lvi = new();
+
+                    var itemType = "unknow";
+                    if (null != info.Node.Type)
+                    {
+                        itemType = info.Node.Type.ToString();
+                    }
+
+                    var itemValue = "null";
+                    if (null != info.Node.Item && null != info.Node.Item.Value)
+                    {
+                        itemValue = info.Node.Item.Value.ToString();
+                    }
+
+                    var itemQuality = "unknow";
+                    if (null != info.Node.Item)
+                    {
+                        itemQuality = info.Node.Item.Quality.ToString();
+                    }
+
+                    var itemSourceTimestamp = "unknow";
+                    if (null != info.Node.Item)
+                    {
+                        itemSourceTimestamp = info.Node.Item.SourceTimestamp.ToString();
+                    }
+
+                    lvi.Text = info.Node.ItemName;
+                    lvi.SubItems.Add(itemType); // type
+                    lvi.SubItems.Add(""); // rights
+                    lvi.SubItems.Add(itemValue); // value
+                    lvi.SubItems.Add(itemQuality); // quality
+                    lvi.SubItems.Add(""); // error
+                    lvi.SubItems.Add(itemSourceTimestamp); // timestamp
+                    lvi.SubItems.Add(""); // handle
+                    MainListView.Items.Add(lvi);
+                    MainListView.EndUpdate();
+                }
+            };
+
+            try
+            {
+                Invoke(action, nodes);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, $"refresh list view error");
+            }
         }
 
         private void ResetListView(IEnumerable<NodeInfo> nodes)
@@ -442,5 +517,6 @@ namespace neuopc
         }
 
         private void MainListView_SelectedIndexChanged(object sender, EventArgs e) { }
+
     }
 }

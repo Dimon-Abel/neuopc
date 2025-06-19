@@ -34,9 +34,6 @@
     <Reference Include="OpcComRcw, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9a40e993cbface53, processorArchitecture=MSIL">
       <HintPath>..\packages\OpcComRcw.2.1.109\lib\net46\OpcComRcw.dll</HintPath>
     </Reference>
-    <Reference Include="OpcNetApi.Xml, Version=2.0.0.0, Culture=neutral, PublicKeyToken=9a40e993cbface53, processorArchitecture=MSIL">
-      <HintPath>..\packages\OpcNetApi.Xml.2.1.109\lib\net40\OpcNetApi.Xml.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
