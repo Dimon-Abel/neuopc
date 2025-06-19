@@ -2,7 +2,8 @@
   "profiles": {
     "neuopc": {
       "commandName": "Executable",
-      "executablePath": "D:\\项目\\新建文件夹\\neuopc\\bin\\x86\\Debug\\net6.0-windows\\neuopc.exe"
+      "executablePath": "D:\\neupoc\\neuopc\\bin\\x86\\Debug\\net6.0-windows\\neuopc.exe",
+      "nativeDebugging": true
     }
   }
 }

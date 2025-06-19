@@ -32,6 +32,7 @@ using System.Runtime.InteropServices;
 using System.Reflection;
 using Opc;
 using Opc.Hda;
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace OpcCom.Hda
 {

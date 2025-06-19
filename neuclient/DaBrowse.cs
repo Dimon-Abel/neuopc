@@ -24,14 +24,12 @@ namespace neuclient
         )
         {
 
-            Log.Information($"DaBrowse.AllNode --- start  parentName: {parentName}");
+            //Log.Information($"DaBrowse.AllNode --- start  parentName: {parentName}");
 
             BrowseElement[] elements;
 
             try
             {
-                Log.Information($"ShowBranches");
-
                 if (null == nodes)
                 {
                     nodes = new List<Node>();
@@ -42,9 +40,7 @@ namespace neuclient
 
                 elements = server.Browse(id, filters, out BrowsePosition position);
 
-                Log.Information($"server.Browse end --- elements: {JsonConvert.SerializeObject(elements)}");
-                Log.Information($"server.Browse end --- position: {JsonConvert.SerializeObject(position)}");
-
+                //Log.Information($"AllNode.server.Browse end --- elements: {JsonConvert.SerializeObject(elements)}");
 
                 if (null != elements && elements.Any())
                 {
@@ -67,12 +63,12 @@ namespace neuclient
 
                             nodes.Add(node);
 
-                            Log.Information($"node: {JsonConvert.SerializeObject(node)}");
+                            //Log.Information($"node: {JsonConvert.SerializeObject(node)}");
 
                         }
                     }
 
-                    Log.Information($"nodes.AddRange end --- nodes.count : {nodes.Count}");
+                    //Log.Information($"nodes.AddRange end --- nodes.count : {nodes.Count}");
 
                     foreach (var element in elements)
                     {
@@ -105,7 +101,7 @@ namespace neuclient
                 Log.Error(ex.StackTrace, "DaBrowse.AllNode.Error");
             }
 
-            Log.Information($"DaBrowse.AllNode.end --- nodes: {JsonConvert.SerializeObject(nodes)}");
+            //Log.Information($"DaBrowse.AllNode.end --- nodes: {JsonConvert.SerializeObject(nodes)}");
 
             return nodes;
         }

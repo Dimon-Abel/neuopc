@@ -23,14 +23,14 @@
 // 2003/03/26 RSA   Initial implementation.
 // 2004/11/11 RSA   Added a base interfaces for BrowsePosition.
 
-using Newtonsoft.Json;
+//using Newtonsoft.Json;
 using Opc;
 using Opc.Da;
 using OpcCom;
 using OpcCom.Da;
 using OpcRcw.Comn;
 using OpcRcw.Da;
-using Serilog;
+//using Serilog;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -404,7 +404,7 @@ namespace OpcCom.Da20
 			BrowseFilters             filters, 
 			out Opc.Da.BrowsePosition position)
 		{
-            Log.Information($"v20.Browse --- start");
+            //Log.Information($"v20.Browse --- start");
 			if (filters == null) throw new ArgumentNullException("filters");	
 
 			position = null;
@@ -417,13 +417,13 @@ namespace OpcCom.Da20
 
 				ArrayList elements = new ArrayList();
 
-				Log.Information($"search for child branches.");
+				//Log.Information($"search for child branches.");
 				// search for child branches.
 				if (filters.BrowseFilter != browseFilter.item)
 				{
 					BrowseElement[] branches = GetElements(elements.Count, itemID, filters, true, ref pos);
 
-                    Log.Information($"branches: {JsonConvert.SerializeObject(branches)}");
+                    //Log.Information($"branches: {JsonConvert.SerializeObject(branches)}");
 
                     if (branches != null)
 					{
@@ -432,7 +432,7 @@ namespace OpcCom.Da20
 
 					position = pos;
 
-                    Log.Information($"return current set if browse halted.");
+                    //Log.Information($"return current set if browse halted.");
                     // return current set if browse halted.
                     if (position != null)
 					{
@@ -1061,37 +1061,37 @@ namespace OpcCom.Da20
 				// move to the specified branch for hierarchial address spaces.
 				try
 				{
-					Log.Information($"move to the specified branch for hierarchial address spaces.");
+					//Log.Information($"move to the specified branch for hierarchial address spaces.");
 					browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_TO, id);
 				}
 				catch(Exception ex1)
 				{
-                    Log.Information($"ex: {ex1.Message}");
+                    //Log.Information($"ex: {ex1.Message}");
                     // try to browse down instead.
                     try
                     {
-                        Log.Information($"try to browse down instead.");
+                        //Log.Information($"try to browse down instead.");
                         browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_DOWN, id);
 					}
 					catch(Exception ex2)
 					{
-						Log.Information($"ex: {ex2.Message}");
+						//Log.Information($"ex: {ex2.Message}");
 						// browse to root.
 						while (true)
 						{	
 							try
 							{				
-								Log.Information($"browse to root.");
+								//Log.Information($"browse to root.");
                                 browser.ChangeBrowsePosition(OPCBROWSEDIRECTION.OPC_BROWSE_UP, String.Empty);
 							}
 							catch(Exception ex)
 							{
-                                Log.Information($"ex: {ex.Message}");
+                                //Log.Information($"ex: {ex.Message}");
 								break;
 							}
 						}
 
-                        Log.Information($"parse the browse path.");
+                        //Log.Information($"parse the browse path.");
                         // parse the browse path.
                         string[] paths = null;
 
@@ -1107,7 +1107,7 @@ namespace OpcCom.Da20
 							}
 						}
 
-						Log.Information($"paths: {JsonConvert.SerializeObject(paths)}");
+						//Log.Information($"paths: {JsonConvert.SerializeObject(paths)}");
 
 						// browse to correct location.
 						for (int ii = 0; ii < paths.Length; ii++)
@@ -1123,7 +1123,7 @@ namespace OpcCom.Da20
 							}
 							catch(Exception ex3)
 							{
-								Log.Information($"ex3: {ex3.Message}");
+								//Log.Information($"ex3: {ex3.Message}");
 								flat = true;
 								//throw new ResultIDException(ResultID.Da.E_UNKNOWN_ITEM_NAME, "Cannot browse because the server is not compliant because it does not support the BROWSE_TO function.");
 							}
@@ -1134,7 +1134,7 @@ namespace OpcCom.Da20
 
 			try
 			{
-				Log.Information($"create the enumerator.");
+				//Log.Information($"create the enumerator.");
 				// create the enumerator.
 				IEnumString enumerator = null;
 
@@ -1146,7 +1146,7 @@ namespace OpcCom.Da20
                 }
 
 
-				Log.Information($"browser.BrowseOPCItemIDs");
+				//Log.Information($"browser.BrowseOPCItemIDs");
 				browser.BrowseOPCItemIDs(
                     browseType,
 					(filters.ElementNameFilter != null)?filters.ElementNameFilter:"",
@@ -1154,7 +1154,7 @@ namespace OpcCom.Da20
 					0,
 					out enumerator);
 
-				Log.Information($"return the enumerator. {JsonConvert.SerializeObject(enumerator)}");
+				//Log.Information($"return the enumerator. {JsonConvert.SerializeObject(enumerator)}");
 				// return the enumerator.
 				return new EnumString(enumerator);
 			}
@@ -1325,9 +1325,7 @@ namespace OpcCom.Da20
 			ref OpcCom.Da20.BrowsePosition position)
 		{
 			// get the enumerator.
-			Log.Information($"get the enumerator.");
-
-            Log.Information($"GetElements -elementsFound: {elementsFound} -itemID: {JsonConvert.SerializeObject(itemID)} -filters: {JsonConvert.SerializeObject(filters)} -branches: {branches} -position: {JsonConvert.SerializeObject(position)}");
+            //Log.Information($"GetElements -elementsFound: {elementsFound} -itemID: {JsonConvert.SerializeObject(itemID)} -filters: {JsonConvert.SerializeObject(filters)} -branches: {branches} -position: {JsonConvert.SerializeObject(position)}");
 
             EnumString enumerator = null;
 			
@@ -1335,7 +1333,7 @@ namespace OpcCom.Da20
 			{
 				IOPCBrowseServerAddressSpace browser = (IOPCBrowseServerAddressSpace)m_server;
 
-                Log.Information($"check the server address space type.");
+                //Log.Information($"check the server address space type.");
                 // check the server address space type.
                 OPCNAMESPACETYPE namespaceType = OPCNAMESPACETYPE.OPC_NS_HIERARCHIAL;
 
@@ -1348,8 +1346,8 @@ namespace OpcCom.Da20
 					throw OpcCom.Interop.CreateException("IOPCBrowseServerAddressSpace.QueryOrganization", e);
 				}
 
-                Log.Information($"return an empty list if requesting branches for a flat address space.");
-				Log.Information($"namespaceType: {namespaceType}");
+                //Log.Information($"return an empty list if requesting branches for a flat address space.");
+				//Log.Information($"namespaceType: {namespaceType}");
                 // return an empty list if requesting branches for a flat address space.
                 if (namespaceType == OPCNAMESPACETYPE.OPC_NS_FLAT)
 				{
@@ -1358,7 +1356,7 @@ namespace OpcCom.Da20
 						return new BrowseElement[0];
 					}
 
-                    Log.Information($"check that root is browsed for flat address spaces.");
+                    //Log.Information($"check that root is browsed for flat address spaces.");
                     // check that root is browsed for flat address spaces.
                     if (itemID != null && itemID.ItemName != null && itemID.ItemName.Length > 0)
 					{
@@ -1366,7 +1364,7 @@ namespace OpcCom.Da20
 					}
 				}
 
-                Log.Information($"get the enumerator.");
+                //Log.Information($"get the enumerator.");
 
 				// get the enumerator.
                 enumerator = GetEnumerator(
@@ -1375,7 +1373,7 @@ namespace OpcCom.Da20
 					branches, 
 					namespaceType == OPCNAMESPACETYPE.OPC_NS_FLAT);
 
-				Log.Information($"enumerator: {JsonConvert.SerializeObject(enumerator)}");
+				//Log.Information($"enumerator: {JsonConvert.SerializeObject(enumerator)}");
 			}
 			else
 			{
@@ -1384,14 +1382,14 @@ namespace OpcCom.Da20
 
 			ArrayList elements = new ArrayList();
 
-            Log.Information($"read elements one at a time.");
+            //Log.Information($"read elements one at a time.");
             // read elements one at a time.
             BrowseElement element = null;
 
 			int start = 0;
 			string[] names = null;
 
-            Log.Information($"get cached name list.");
+            //Log.Information($"get cached name list.");
             // get cached name list.
             if (position != null)
 			{
@@ -1406,7 +1404,7 @@ namespace OpcCom.Da20
 				{
 					for (int ii = start; ii < names.Length; ii++)
 					{
-                        Log.Information($"check if max returned elements is exceeded.");
+                        //Log.Information($"check if max returned elements is exceeded.");
                         // check if max returned elements is exceeded.
                         if (filters.MaxElementsReturned != 0 && filters.MaxElementsReturned == elements.Count+elementsFound)
 						{
@@ -1416,11 +1414,11 @@ namespace OpcCom.Da20
 							break;
 						}
 
-                        Log.Information($"get next element.");
+                        //Log.Information($"get next element.");
                         // get next element.
                         element = GetElement(itemID, names[ii], filters, branches);
 
-						Log.Information($"element: {JsonConvert.SerializeObject(element)}");
+						//Log.Information($"element: {JsonConvert.SerializeObject(element)}");
 
 						if (element == null)
 						{
@@ -1432,7 +1430,7 @@ namespace OpcCom.Da20
 					}
 				}
 
-                Log.Information($"check if browse halted. elements: {JsonConvert.SerializeObject(elements)}");
+                //Log.Information($"check if browse halted. elements: {JsonConvert.SerializeObject(elements)}");
 
                 // check if browse halted.
                 if (position != null)
@@ -1440,7 +1438,7 @@ namespace OpcCom.Da20
 					break;
 				}
 
-                Log.Information($"fetch next element names.: {JsonConvert.SerializeObject(names)}");
+                //Log.Information($"fetch next element names.: {JsonConvert.SerializeObject(names)}");
                 // fetch next element name.
                 names = enumerator.Next(10);
 				start = 0;

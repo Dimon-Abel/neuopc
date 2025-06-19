@@ -38,8 +38,8 @@ using Opc.Da;
 using OpcCom.Da;
 using OpcRcw.Da;
 using OpcRcw.Comn;
-using Serilog;
-using Newtonsoft.Json;
+//using Serilog;
+//using Newtonsoft.Json;
 
 namespace OpcCom.Da.Wrapper
 {
@@ -524,7 +524,7 @@ namespace OpcCom.Da.Wrapper
                     filters.ReturnPropertyValues = bReturnPropertyValues != 0;
                     filters.PropertyIDs = Interop.GetPropertyIDs(pdwPropertyIDs);
 
-                    Log.Information($"Browse.filters: {JsonConvert.SerializeObject(filters)}");
+                    //Log.Information($"Browse.filters: {JsonConvert.SerializeObject(filters)}");
 
                     Opc.Da.BrowsePosition position = null;
                     Opc.Da.BrowseElement[] elements = null;
@@ -571,7 +571,7 @@ namespace OpcCom.Da.Wrapper
                         // fetch next set of elements.
                         elements = m_server.BrowseNext(ref position);
 
-                        Log.Information($"m_server.BrowseNext：{JsonConvert.SerializeObject(elements)}");
+                        //Log.Information($"m_server.BrowseNext：{JsonConvert.SerializeObject(elements)}");
                     }
 
                     // clear any expired continuation points.
@@ -738,7 +738,7 @@ namespace OpcCom.Da.Wrapper
         /// <remarks/>
         public void ChangeBrowsePosition(OpcRcw.Da.OPCBROWSEDIRECTION dwBrowseDirection, string szString)
         {
-            Log.Information($"ChangeBrowsePosition - start");
+            //Log.Information($"ChangeBrowsePosition - start");
             lock (this)
             {
                 try
@@ -756,7 +756,7 @@ namespace OpcCom.Da.Wrapper
                     ItemIdentifier itemID = null;
                     Opc.Da.BrowsePosition position = null;
 
-                    Log.Information($"filters - {JsonConvert.SerializeObject(filters)}");
+                    //Log.Information($"filters - {JsonConvert.SerializeObject(filters)}");
 
 
                     switch (dwBrowseDirection)
@@ -775,7 +775,7 @@ namespace OpcCom.Da.Wrapper
                                 // validate item id.
                                 BrowseElement[] children = null;
 
-                                Log.Information($"validate item id.");
+                                //Log.Information($"validate item id.");
                                 try
                                 {
                                     children = m_server.Browse(itemID, filters, out position);
@@ -785,14 +785,14 @@ namespace OpcCom.Da.Wrapper
                                     throw Server.CreateException(ResultIDs.E_INVALIDARG);
                                 }
 
-                                Log.Information($"check that actually a branch.");
+                                //Log.Information($"check that actually a branch.");
                                 // check that actually a branch.
                                 if (children == null || children.Length == 0)
                                 {
                                     throw Server.CreateException(ResultIDs.E_INVALIDARG);
                                 }
 
-                                Log.Information($"update stack.");
+                                //Log.Information($"update stack.");
                                 // update stack.
                                 m_browseStack.Clear();
 
@@ -805,14 +805,14 @@ namespace OpcCom.Da.Wrapper
 
                         case OPCBROWSEDIRECTION.OPC_BROWSE_DOWN:
                             {
-                                Log.Information($"check for invalid name.");
+                                //Log.Information($"check for invalid name.");
                                 // check for invalid name.
                                 if (szString == null || szString.Length == 0)
                                 {
                                     throw Server.CreateException(ResultIDs.E_INVALIDARG);
                                 }
 
-                                Log.Information($"find the specified child.");
+                                //Log.Information($"find the specified child.");
                                 // find the specified child.
                                 BrowseElement element = FindChild(szString);
 
@@ -829,7 +829,7 @@ namespace OpcCom.Da.Wrapper
 
                         case OPCBROWSEDIRECTION.OPC_BROWSE_UP:
                             {
-                                Log.Information($"can't move up from root.");
+                                //Log.Information($"can't move up from root.");
                                 // can't move up from root.
                                 if (m_browseStack.Count == 0)
                                 {
@@ -857,8 +857,8 @@ namespace OpcCom.Da.Wrapper
                 }
                 catch (Exception e)
                 {
-                    Log.Information($"e: {e.Message}");
-                    Log.Information($"e: {e.StackTrace}");
+                    //Log.Information($"e: {e.Message}");
+                    //Log.Information($"e: {e.StackTrace}");
                     throw CreateException(e);
                 }
             }
@@ -871,7 +871,7 @@ namespace OpcCom.Da.Wrapper
             {
                 try
                 {
-                    Log.Information($"get current browse position.");
+                    //Log.Information($"get current browse position.");
                     // get current browse position.
                     ItemIdentifier itemID = null;
 
@@ -882,17 +882,17 @@ namespace OpcCom.Da.Wrapper
 
                     ArrayList hits = new ArrayList();
 
-                    Log.Information($"browse for items.");
+                    //Log.Information($"browse for items.");
                     // browse for items.
                     Browse(itemID, dwBrowseFilterType, szFilterCriteria, vtDataTypeFilter, dwAccessRightsFilter, hits);
 
-                    Log.Information($"create enumerator.");
+                    //Log.Information($"create enumerator.");
                     // create enumerator.
                     ppIEnumString = (IEnumString)new EnumString(hits);
                 }
                 catch (Exception e)
                 {
-                    Log.Information($"e: {e.Message}");
+                    //Log.Information($"e: {e.Message}");
                     throw CreateException(e);
                 }
             }
@@ -3933,7 +3933,8 @@ namespace OpcCom.Da.Wrapper
                 }
                 catch (Exception e)
                 {
-                    throw Server.CreateException(e);
+                    throw e;
+                    //throw Server.CreateException(e);
                 }
             }
         }

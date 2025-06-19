@@ -31,6 +31,7 @@ using System.Net;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using Opc;
+using FILETIME = System.Runtime.InteropServices.ComTypes.FILETIME;
 
 namespace OpcCom
 {
@@ -850,10 +851,12 @@ namespace OpcCom
 			return GetFILETIME((FILETIME)Marshal.PtrToStructure(pFiletime, typeof(FILETIME)));
 		}
 
-		/// <summary>
-		/// Unmarshals a WIN32 FILETIME.
-		/// </summary>
-		public static DateTime GetFILETIME(FILETIME filetime)
+		
+
+        /// <summary>
+        /// Unmarshals a WIN32 FILETIME.
+        /// </summary>
+        public static DateTime GetFILETIME(FILETIME filetime)
 		{
 			// convert FILETIME structure to a 64 bit integer.
 			long buffer = (long)filetime.dwHighDateTime;

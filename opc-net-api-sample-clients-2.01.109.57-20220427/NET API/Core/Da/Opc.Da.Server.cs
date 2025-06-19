@@ -24,6 +24,7 @@
 
 using Opc.Hda;
 using OpcRcw.Da;
+using Serilog;
 using System;
 using System.Collections;
 using System.Globalization;
@@ -297,15 +298,18 @@ namespace Opc.Da
 		/// <param name="state">The initial state of the subscription.</param>
 		/// <returns>The new subscription object.</returns>
 		public virtual ISubscription CreateSubscription(SubscriptionState state) 
-		{ 
+		{
 			if (state == null)    throw new ArgumentNullException("state");
 			if (m_server == null) throw new NotConnectedException();
-			
+
+			Log.Information($"create subscription on server. --- start");
 			// create subscription on server.
-			ISubscription subscription = ((IServer)m_server).CreateSubscription(state); 
-			
-			// set filters.
-			subscription.SetResultFilters(m_filters);
+			ISubscription subscription = ((IServer)m_server).CreateSubscription(state);
+
+            Log.Information($"create subscription on server. --- end");
+
+            // set filters.
+            subscription.SetResultFilters(m_filters);
 
 			// append new subscription to existing list.
 			SubscriptionCollection subscriptions = new SubscriptionCollection();
@@ -318,10 +322,16 @@ namespace Opc.Da
 				}
 			}
 
-			subscriptions.Add(CreateSubscription(subscription));
+            Log.Information($"subscriptions.Add(CreateSubscription(subscription)) --- start");
 
-			// save new subscription list.
-			m_subscriptions = subscriptions;
+            subscriptions.Add(CreateSubscription(subscription));
+
+            Log.Information($"subscriptions.Add(CreateSubscription(subscription)) --- end");
+
+            // save new subscription list.
+            m_subscriptions = subscriptions;
+
+			Log.Information($"m_subscriptions.Count: {m_subscriptions.Count}");
 
 			// return new subscription.
 			return m_subscriptions[m_subscriptions.Count-1];
