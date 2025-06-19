@@ -35,7 +35,6 @@ namespace neuclient
                     nodes = new List<Node>();
                 }
 
-
                 var filters = new BrowseFilters { BrowseFilter = browseFilter.all };
 
                 elements = server.Browse(id, filters, out BrowsePosition position);
@@ -50,6 +49,13 @@ namespace neuclient
                         //var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
                         var itemName = $"{elementName}";
 
+
+                        //if (allElements.Any(x => x.Name == item.Name))
+                        //{
+                        //    continue;
+                        //}
+
+                        //allElements.Add(item);
 
                         if (!nodes.Any(x => x.Name == item.Name))
                         {

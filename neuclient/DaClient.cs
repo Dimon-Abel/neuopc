@@ -42,8 +42,8 @@ namespace neuclient
                 throw;
             }
 
-            _user = "administrator";
-            _password = "TJ@ihistorian2017";
+            _user = user;
+            _password = password;
             _domain = domain;
         }
 
@@ -65,7 +65,6 @@ namespace neuclient
 
             _server = new Opc.Da.Server(new OpcCom.Factory(), _url);
 
-            Log.Information($"_user: {_user},_password: {_password},_domain: {_domain}");
 
             if (!string.IsNullOrEmpty(_user))
             {
@@ -195,7 +194,7 @@ namespace neuclient
             Opc.Da.ItemValueResult[] results = null;
             try
             {
-                Log.Information($"_server.Read -- start");
+                //Log.Information($"_server.Read -- start");
 
                 results = _server.Read(items.ToArray());
             }
@@ -261,11 +260,11 @@ namespace neuclient
                 UpdateRate = MonitorInterval ?? DefaultMonitorInterval
             };
 
-            Log.Information($"subItem: {JsonConvert.SerializeObject(subItem)}");
+            //Log.Information($"subItem: {JsonConvert.SerializeObject(subItem)}");
 
             var sub = _server.CreateSubscription(subItem);
 
-            Log.Information($"sub: {JsonConvert.SerializeObject(sub)}");
+            //Log.Information($"sub: {JsonConvert.SerializeObject(sub)}");
 
             void unsubscribe() => new Thread(o => _server.CancelSubscription(sub)).Start();
             sub.DataChanged += (handle, requestHandle, values) =>
@@ -291,6 +290,8 @@ namespace neuclient
             };
             sub.AddItems(new[] { new Opc.Da.Item { ItemName = tag } });
             sub.SetEnabled(true);
+
+            Log.Information($"DataChanged --- end");
         }
 
         public void Monitor<T>(string tag, Action<ReadItem<T>, Action> callback)

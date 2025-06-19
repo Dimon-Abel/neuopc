@@ -27,21 +27,30 @@ namespace neuopc
 
     internal class Client
     {
-        private static readonly int MaxReadCount = 500;
+        private static readonly int MaxReadCount = 100;
         private static DaClient _client = null;
         private static bool _clientRunning = false;
         private static bool _momitor = true;
-        private static int _sleepTime = 1000;
+        private static int _sleepTime = 1500;
         private static Thread _clientThread = null;
         private static Dictionary<string, NodeInfo> _infoMap = null;
         private static Channel<Msg> _dataChannel = null;
         private static Action<IEnumerable<NodeInfo>> _action;
+        private static Action<IEnumerable<Item>> _monitorAction;
+
+        public static void SetMonitor(bool enable, Action<IEnumerable<Item>> action)
+        {
+            _momitor = enable;
+            _monitorAction = action;
+            _sleepTime = 3000;
+        }
 
         public static IEnumerable<Node> AllItemNode(Opc.Da.Server server)
         {
             IEnumerable<Node> nodes = null;
             try
             {
+                DaBrowse.allElements.Clear();
                 nodes = DaBrowse.AllNode(server);
             }
             catch (Exception ex)
@@ -169,12 +178,12 @@ namespace neuopc
                 _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
             }
 
-            Log.Information($"_action: {_action?.GetHashCode()}");
+            //Log.Information($"_action: {_action?.GetHashCode()}");
 
-            if (_action != null)
-            {
-                _action(GetNodes());
-            }
+            //if (_action != null && !_momitor)
+            //{
+            //    _action(GetNodes());
+            //}
 
             Log.Information("ReadTags end");
         }
@@ -191,7 +200,7 @@ namespace neuopc
             int count = _infoMap.Count;
             int times = count / MaxReadCount + ((count % MaxReadCount) == 0 ? 0 : 1);
 
-            Log.Information($"times: {times}");
+            //Log.Information($"times: {times}");
 
             for (int i = 0; i < times; i++)
             {
@@ -202,7 +211,7 @@ namespace neuopc
 
                 var tags = nodes?.Select(n => n.Node.ItemName).ToList();
 
-                Log.Information($"tags --- : {JsonConvert.SerializeObject(tags)}");
+                //Log.Information($"tags --- : {JsonConvert.SerializeObject(tags)}");
 
                 if (null == tags || 0 >= tags.Count)
                 {
@@ -213,7 +222,7 @@ namespace neuopc
                     tags,
                     (dic, stop) =>
                     {
-                        Log.Information($"_clientRunning: {_clientRunning}");
+                        //Log.Information($"_clientRunning: {_clientRunning}");
 
                         if (false == _clientRunning)
                         {
@@ -240,7 +249,15 @@ namespace neuopc
                             list.Add(it);
                         }
 
+                        Log.Information($"list.count: {list.Count}");
+
                         _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
+
+                        //if (_monitorAction != null)
+                        //{
+                        //    _monitorAction(list);
+                        //}
+
                     }
                 );
             }
@@ -281,6 +298,8 @@ namespace neuopc
                 {
                     Log.Error(ex, "read tags failed");
                 }
+
+                //Log.Information($"_monitor: {_momitor}");
 
                 try
                 {
@@ -397,7 +416,7 @@ namespace neuopc
             }
         }
 
-        public static void Start(string serverUrl, Channel<Msg> dataChannel, int? monitorTime, Action<IEnumerable<NodeInfo>> action = null)
+        public static void Start(string serverUrl, Channel<Msg> dataChannel, Action<IEnumerable<NodeInfo>> action = null)
         {
             try
             {
@@ -406,18 +425,11 @@ namespace neuopc
                     return;
                 }
 
-                if (monitorTime.HasValue)
-                {
-                    _momitor = false;
-                    _sleepTime = monitorTime.Value;
-                }
-
-                if (action != null)
-                {
-                    _action = action;
-                }
-
-                Log.Information($"_momitor: {_momitor}");
+                
+                //if (action != null)
+                //{
+                //    _action = action;
+                //}
 
                 _client = new DaClient(serverUrl, string.Empty, string.Empty, string.Empty);
                 _clientRunning = true;

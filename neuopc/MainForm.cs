@@ -7,6 +7,9 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Serilog;
 using neuclient;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
+using neulib;
+using Newtonsoft.Json;
 
 namespace neuopc
 {
@@ -86,6 +89,9 @@ namespace neuopc
         private void MainForm_Load(object sender, EventArgs e)
         {
             Log.Information("neuopc start");
+
+            // 重置像素
+            groupBox1.Size = new Size(700, 430);
 
             LoadMetaInfo();
 
@@ -282,15 +288,11 @@ namespace neuopc
 
                     var uri = DAServerComboBox.Text;
 
-                    int time = 1500;
-                    //var intervalTime = IntervalTime.Text;
-                    //if (int.TryParse(intervalTime, out int result))
-                    //{
-                    //    time
-                    //}
+                    //Log.Information($"cbSub.Checked: {cbSub.Checked}");
 
+                    Client.SetMonitor(cbSub.Checked, MonitorListView);
 
-                    Client.Start(uri, Server.DataChannel, time, RefreshListView);
+                    Client.Start(uri, Server.DataChannel, RefreshListView);
 
                     SwitchButton.Text = "Stop";
                     DAHostComboBox.Enabled = false;
@@ -402,6 +404,83 @@ namespace neuopc
             catch (Exception exception)
             {
                 Log.Error(exception, $"refresh list view error");
+            }
+        }
+
+        private ListViewItem CreateLv(Item item)
+        {
+            ListViewItem lvi = new();
+            var itemType = "unknow";
+            if (null != item.Type)
+            {
+                itemType = item.Type.ToString();
+            }
+
+            var itemValue = "null";
+            if (null != item && null != item.Value)
+            {
+                itemValue = item.Value.ToString();
+            }
+
+            var itemQuality = "unknow";
+            if (null != item)
+            {
+                itemQuality = item.Quality.ToString();
+            }
+
+            var itemSourceTimestamp = "unknow";
+            if (null != item)
+            {
+                itemSourceTimestamp = item.Timestamp.ToString();
+            }
+
+            lvi.Text = item.Name;
+            lvi.SubItems.Add(itemType); // type
+            lvi.SubItems.Add(""); // rights
+            lvi.SubItems.Add(itemValue); // value
+            lvi.SubItems.Add(itemQuality); // quality
+            lvi.SubItems.Add(""); // error
+            lvi.SubItems.Add(itemSourceTimestamp); // timestamp
+            lvi.SubItems.Add(""); // handle
+
+            return lvi;
+        }
+
+        private void MonitorListView(IEnumerable<Item> items)
+        {
+            Log.Information($"items: {JsonConvert.SerializeObject(items.FirstOrDefault())}");
+
+            Log.Information($"MainListView.Items: {JsonConvert.SerializeObject(MainListView.Items[0])}");
+
+
+            Action<IEnumerable<Item>> action = (data) =>
+            {
+                foreach (var item in data)
+                {
+                    MainListView.BeginUpdate();
+
+                    var index = MainListView.Items.IndexOfKey(item.Name);
+                    if (index > -1)
+                    {
+                        MainListView.Items.RemoveAt(index);
+                        MainListView.Items.Insert(0, CreateLv(item));
+                    }
+                    else
+                    {
+                        MainListView.Items.Add(CreateLv(item));
+                    }
+
+                    MainListView.EndUpdate();
+                }
+            };
+
+            try
+            {
+                Invoke(action, items);
+            }
+            catch (Exception exception)
+            {
+                Log.Error(exception, $"reset list view error");
             }
         }
 

@@ -302,11 +302,11 @@ namespace Opc.Da
 			if (state == null)    throw new ArgumentNullException("state");
 			if (m_server == null) throw new NotConnectedException();
 
-			Log.Information($"create subscription on server. --- start");
+			//Log.Information($"create subscription on server. --- start");
 			// create subscription on server.
 			ISubscription subscription = ((IServer)m_server).CreateSubscription(state);
 
-            Log.Information($"create subscription on server. --- end");
+            //Log.Information($"create subscription on server. --- end");
 
             // set filters.
             subscription.SetResultFilters(m_filters);
@@ -322,16 +322,16 @@ namespace Opc.Da
 				}
 			}
 
-            Log.Information($"subscriptions.Add(CreateSubscription(subscription)) --- start");
+            //Log.Information($"subscriptions.Add(CreateSubscription(subscription)) --- start");
 
             subscriptions.Add(CreateSubscription(subscription));
 
-            Log.Information($"subscriptions.Add(CreateSubscription(subscription)) --- end");
+            //Log.Information($"subscriptions.Add(CreateSubscription(subscription)) --- end");
 
             // save new subscription list.
             m_subscriptions = subscriptions;
 
-			Log.Information($"m_subscriptions.Count: {m_subscriptions.Count}");
+			//Log.Information($"m_subscriptions.Count: {m_subscriptions.Count}");
 
 			// return new subscription.
 			return m_subscriptions[m_subscriptions.Count-1];
