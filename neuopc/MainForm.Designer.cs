@@ -291,7 +291,7 @@ namespace neuopc
             // cbSub
             // 
             cbSub.AutoSize = true;
-            cbSub.Location = new System.Drawing.Point(210, 99);
+            cbSub.Location = new System.Drawing.Point(199, 114);
             cbSub.Margin = new System.Windows.Forms.Padding(2);
             cbSub.Name = "cbSub";
             cbSub.Size = new System.Drawing.Size(142, 21);
@@ -314,7 +314,7 @@ namespace neuopc
             // 
             label7.AutoSize = true;
             label7.ForeColor = System.Drawing.SystemColors.ButtonShadow;
-            label7.Location = new System.Drawing.Point(465, 69);
+            label7.Location = new System.Drawing.Point(448, 72);
             label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label7.Name = "label7";
             label7.Size = new System.Drawing.Size(13, 17);
@@ -325,7 +325,7 @@ namespace neuopc
             // 
             label6.AutoSize = true;
             label6.ForeColor = System.Drawing.SystemColors.ButtonShadow;
-            label6.Location = new System.Drawing.Point(465, 39);
+            label6.Location = new System.Drawing.Point(449, 40);
             label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label6.Name = "label6";
             label6.Size = new System.Drawing.Size(13, 17);
@@ -337,7 +337,7 @@ namespace neuopc
             SaveButton.Location = new System.Drawing.Point(359, 310);
             SaveButton.Margin = new System.Windows.Forms.Padding(2);
             SaveButton.Name = "SaveButton";
-            SaveButton.Size = new System.Drawing.Size(102, 24);
+            SaveButton.Size = new System.Drawing.Size(102, 34);
             SaveButton.TabIndex = 35;
             SaveButton.Text = "Save";
             SaveButton.UseVisualStyleBackColor = true;
@@ -346,7 +346,7 @@ namespace neuopc
             // DALabel
             // 
             DALabel.AutoSize = true;
-            DALabel.Location = new System.Drawing.Point(144, 126);
+            DALabel.Location = new System.Drawing.Point(144, 156);
             DALabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             DALabel.Name = "DALabel";
             DALabel.Size = new System.Drawing.Size(0, 17);
@@ -355,7 +355,7 @@ namespace neuopc
             // CheckBox
             // 
             CheckBox.AutoSize = true;
-            CheckBox.Location = new System.Drawing.Point(133, 312);
+            CheckBox.Location = new System.Drawing.Point(125, 318);
             CheckBox.Margin = new System.Windows.Forms.Padding(2);
             CheckBox.Name = "CheckBox";
             CheckBox.Size = new System.Drawing.Size(121, 21);
@@ -368,7 +368,7 @@ namespace neuopc
             SwitchButton.Location = new System.Drawing.Point(250, 310);
             SwitchButton.Margin = new System.Windows.Forms.Padding(2);
             SwitchButton.Name = "SwitchButton";
-            SwitchButton.Size = new System.Drawing.Size(102, 24);
+            SwitchButton.Size = new System.Drawing.Size(102, 34);
             SwitchButton.TabIndex = 32;
             SwitchButton.Text = "Start";
             SwitchButton.UseVisualStyleBackColor = true;
@@ -385,7 +385,7 @@ namespace neuopc
             // label5
             // 
             label5.AutoSize = true;
-            label5.Location = new System.Drawing.Point(34, 234);
+            label5.Location = new System.Drawing.Point(23, 235);
             label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label5.Name = "label5";
             label5.Size = new System.Drawing.Size(114, 17);
@@ -395,7 +395,7 @@ namespace neuopc
             // label3
             // 
             label3.AutoSize = true;
-            label3.Location = new System.Drawing.Point(36, 176);
+            label3.Location = new System.Drawing.Point(27, 177);
             label3.Name = "label3";
             label3.Size = new System.Drawing.Size(110, 17);
             label3.TabIndex = 27;
@@ -420,7 +420,7 @@ namespace neuopc
             // label4
             // 
             label4.AutoSize = true;
-            label4.Location = new System.Drawing.Point(62, 205);
+            label4.Location = new System.Drawing.Point(52, 206);
             label4.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             label4.Name = "label4";
             label4.Size = new System.Drawing.Size(85, 17);
@@ -440,7 +440,7 @@ namespace neuopc
             // DAServerComboBox
             // 
             DAServerComboBox.FormattingEnabled = true;
-            DAServerComboBox.Location = new System.Drawing.Point(144, 67);
+            DAServerComboBox.Location = new System.Drawing.Point(144, 69);
             DAServerComboBox.Margin = new System.Windows.Forms.Padding(2);
             DAServerComboBox.Name = "DAServerComboBox";
             DAServerComboBox.Size = new System.Drawing.Size(318, 25);
@@ -450,7 +450,7 @@ namespace neuopc
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(52, 69);
+            label2.Location = new System.Drawing.Point(42, 72);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(95, 17);
             label2.TabIndex = 6;
@@ -459,7 +459,7 @@ namespace neuopc
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new System.Drawing.Point(60, 40);
+            label1.Location = new System.Drawing.Point(52, 40);
             label1.Name = "label1";
             label1.Size = new System.Drawing.Size(85, 17);
             label1.TabIndex = 3;
@@ -467,10 +467,10 @@ namespace neuopc
             // 
             // TestButton
             // 
-            TestButton.Location = new System.Drawing.Point(359, 96);
-            TestButton.Margin = new System.Windows.Forms.Padding(1);
+            TestButton.Location = new System.Drawing.Point(359, 109);
+            TestButton.Margin = new System.Windows.Forms.Padding(2);
             TestButton.Name = "TestButton";
-            TestButton.Size = new System.Drawing.Size(102, 24);
+            TestButton.Size = new System.Drawing.Size(102, 29);
             TestButton.TabIndex = 2;
             TestButton.Text = "Connection Test";
             TestButton.UseVisualStyleBackColor = true;

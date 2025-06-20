@@ -24,6 +24,39 @@ namespace neuopc
 
             _running = true;
             LogTaskRun();
+
+            // 启动监听数据通道并刷新Tags窗口
+            //StartTagRefreshTask();
+        }
+
+        // 新增方法：实时监听数据通道并刷新Tags窗口
+        private void StartTagRefreshTask()
+        {
+            var _ = Task.Run(async () =>
+            {
+                // 假设Server.DataChannel为Channel<Msg>
+                var channel = Server.DataChannel;
+                if (channel == null) return;
+                while (_running && await channel.Reader.WaitToReadAsync())
+                {
+                    if (!channel.Reader.TryRead(out var msg)) continue;
+                    if (msg?.Items == null) continue;
+
+                    // 这里需要将msg.Items转换为NodeInfo列表
+                    var nodes = Client.GetNodes();
+                    if (nodes != null)
+                    {
+                        try
+                        {
+                            Invoke(new Action<IEnumerable<NodeInfo>>(ResetListView), nodes);
+                        }
+                        catch (Exception ex)
+                        {
+                            Serilog.Log.Error(ex, "刷新Tags窗口失败");
+                        }
+                    }
+                }
+            });
         }
 
         private void LogTaskRun()

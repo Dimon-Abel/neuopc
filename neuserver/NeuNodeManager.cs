@@ -10,6 +10,7 @@ namespace neuserver
         private FolderState? _folder;
         private readonly List<BaseDataVariableState> _variables;
         private readonly ValueWrite? _write;
+        private readonly ReaderWriterLockSlim _rwLock = new();
 
         public NeuNodeManager(
             IServerInternal server,
@@ -24,6 +25,16 @@ namespace neuserver
         {
             _write = write;
             _variables = new List<BaseDataVariableState>();
+        }
+
+        public override void Browse(OperationContext context, ref ContinuationPoint continuationPoint, IList<ReferenceDescription> references)
+        {
+            base.Browse(context, ref continuationPoint, references);
+        }
+
+        public override ServiceResult SubscribeToAllEvents(OperationContext context, uint subscriptionId, IEventMonitoredItem monitoredItem, bool unsubscribe)
+        {
+            return base.SubscribeToAllEvents(context, subscriptionId, monitoredItem, unsubscribe);
         }
 
         private void AddNode(Item item)
@@ -66,50 +77,44 @@ namespace neuserver
             _variables.Add(variable);
         }
 
-        private void SaveNode(Item item, BaseDataVariableState? variable)
+        public void SaveNode(Item item, BaseDataVariableState? variable)
         {
-            if (null == variable)
+            if (variable == null)
             {
+                _rwLock.EnterWriteLock();
                 try
                 {
                     AddNode(item);
                     AddPredefinedNode(SystemContext, _folder);
                 }
-                catch (Exception exception)
+                finally
                 {
-                    System.Diagnostics.Debug.WriteLine(
-                        $"add variable exception, error:{exception.Message}"
-                    );
+                    _rwLock.ExitWriteLock();
                 }
             }
             else
             {
-                try
-                {
-                    SetVariable(variable, item);
-                    variable.ClearChangeMasks(SystemContext, false);
-                }
-                catch (Exception exception)
-                {
-                    System.Diagnostics.Debug.WriteLine(
-                        $"update variable exception, error:{exception.Message}"
-                    );
-                }
+                // 只读操作无需加锁，或用 EnterReadLock() 保护
+                SetVariable(variable, item);
+                variable.ClearChangeMasks(SystemContext, false);
             }
         }
 
         public void UpdateNodes(List<Item> list)
         {
+            // 在并行处理前创建 _variables 的快照
+            List<BaseDataVariableState> variablesSnapshot;
             lock (Lock)
             {
-                foreach (var item in list)
-                {
-                    var variable = _variables
-                        .Where(v => v.SymbolicName.Equals(item.Name))
-                        .FirstOrDefault();
-                    SaveNode(item, variable);
-                }
+                variablesSnapshot = new List<BaseDataVariableState>(_variables);
             }
+
+            Parallel.ForEach(list, item =>
+            {
+                // 只查找快照，不会抛出集合被修改的异常
+                var variable = variablesSnapshot.FirstOrDefault(v => v.SymbolicName.Equals(item.Name));
+                SaveNode(item, variable);
+            });
         }
 
         public override void CreateAddressSpace(

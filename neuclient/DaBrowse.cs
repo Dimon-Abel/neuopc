@@ -57,7 +57,7 @@ namespace neuclient
 
                         //allElements.Add(item);
 
-                        if (!nodes.Any(x => x.Name == item.Name))
+                        if (!nodes.Any(x => x.ItemName == itemName))
                         {
                             var node = new Node()
                             {
@@ -78,7 +78,9 @@ namespace neuclient
 
                     foreach (var element in elements)
                     {
-                        if (allElements.Any(x=>x.Name == element.Name))
+                        var elementName = string.IsNullOrWhiteSpace(element.ItemName) ? element.Name : element.ItemName;
+
+                        if (allElements.Any(x=>x.ItemName == elementName))
                         {
                             continue;
                         }
@@ -87,7 +89,6 @@ namespace neuclient
 
                         if (element.HasChildren)
                         {
-                            var elementName = string.IsNullOrWhiteSpace(element.ItemName) ? element.Name : element.ItemName;
                             //var itemName = $"{(!string.IsNullOrWhiteSpace(parentName) ? parentName + "." : "")}{elementName}";
                             var itemName = $"{elementName}";
 

@@ -251,7 +251,17 @@ namespace DaClient
             };
 
             var sub = _server.CreateSubscription(subItem);
-            void unsubscribe() => new Thread(o => _server.CancelSubscription(sub)).Start();
+            void unsubscribe() => Task.Run(() =>
+            {
+                try
+                {
+                    _server.CancelSubscription(sub);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex);
+                }
+            });
             sub.DataChanged += (handle, requestHandle, values) =>
             {
                 var monitorItem = new ReadItem()
@@ -285,7 +295,17 @@ namespace DaClient
             };
 
             var sub = _server.CreateSubscription(subItem);
-            void unsubscribe() => new Thread(o => _server.CancelSubscription(sub)).Start();
+            void unsubscribe() => Task.Run(() =>
+            {
+                try
+                {
+                    _server.CancelSubscription(sub);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex);
+                }
+            });
             sub.DataChanged += (handle, requestHandle, values) =>
             {
                 T casted = TryCastResult<T>(values[0].Value);
@@ -330,17 +350,17 @@ namespace DaClient
 
             var sub = _server.CreateSubscription(subItem);
             void unsubscribe() =>
-                new Thread(o =>
-                {
-                    try
-                    {
-                        _server.CancelSubscription(sub);
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.Write(ex);
-                    }
-                }).Start();
+               Task.Run(() =>
+               {
+                   try
+                   {
+                       _server.CancelSubscription(sub);
+                   }
+                   catch (Exception ex)
+                   {
+                       System.Diagnostics.Debug.Write(ex);
+                   }
+               });
 
             IDictionary<string, ReadItem> readEvents = new ConcurrentDictionary<string, ReadItem>();
             sub.DataChanged += (handle, requestHandle, values) =>
@@ -407,7 +427,17 @@ namespace DaClient
             };
 
             var sub = _server.CreateSubscription(subItem);
-            void unsubscribe() => new Thread(o => _server.CancelSubscription(sub)).Start();
+            void unsubscribe() => Task.Run(() =>
+            {
+                try
+                {
+                    _server.CancelSubscription(sub);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex);
+                }
+            });
             sub.DataChanged += (handle, requestHandle, values) =>
             {
                 IDictionary<string, ReadItem> readEvents =

@@ -2,9 +2,11 @@
 using Opc.Ua.Configuration;
 using System.Threading.Channels;
 using neulib;
+using BenchmarkDotNet.Attributes;
 
 namespace neuserver
 {
+    [MemoryDiagnoser]
     public class UaServer
     {
         private readonly ApplicationInstance _application;
@@ -33,8 +35,6 @@ namespace neuserver
                 SecurityPolicyUri = SecurityPolicies.None
             };
 
-
-
             var tokenPolicies = new List<UserTokenPolicy>
             {
                 new UserTokenPolicy(UserTokenType.Anonymous),
@@ -44,9 +44,9 @@ namespace neuserver
             var serverConfiguration = new ServerConfiguration()
             {
                 BaseAddresses = { uri },
-                MinRequestThreadCount = 5,
-                MaxRequestThreadCount = 100,
-                MaxQueuedRequestCount = 200,
+                MinRequestThreadCount = 20,
+                MaxRequestThreadCount = 200,
+                MaxQueuedRequestCount = 400,
                 UserTokenPolicies = new UserTokenPolicyCollection(tokenPolicies),
                 SecurityPolicies = new ServerSecurityPolicyCollection
                 {
@@ -103,6 +103,12 @@ namespace neuserver
                 TraceConfiguration = new TraceConfiguration(),
             };
 
+            config.TransportQuotas.MaxArrayLength = 65535;
+            config.TransportQuotas.MaxStringLength = 65535;
+            config.TransportQuotas.MaxMessageSize = 4 * 1024 * 1024;
+            config.TransportQuotas.MaxByteStringLength = 4 * 1024 * 1024;
+
+
             config.Validate(ApplicationType.Server).GetAwaiter().GetResult();
             if (config.SecurityConfiguration.AutoAcceptUntrustedCertificates)
             {
@@ -121,22 +127,42 @@ namespace neuserver
 
             _server = new NeuServer(_write);
 
-            _task = new Task(async () =>
+            //_task = new Task(async () =>
+            //{
+            //    while (await DataChannel.Reader.WaitToReadAsync())
+            //    {
+            //        if (DataChannel.Reader.TryRead(out var msg))
+            //        {
+            //            if (null != msg && null != msg.Items)
+            //            {
+            //                _server.UpdateNodes(msg.Items);
+            //            }
+            //        }
+            //    }
+            //});
+            //_task.Start();
+
+            // 替换 _task 初始化部分
+            _task = Task.Run(async () =>
             {
-                while (await DataChannel.Reader.WaitToReadAsync())
+                const int batchSize = 500;
+                await foreach (var msg in DataChannel.Reader.ReadAllAsync())
                 {
-                    if (DataChannel.Reader.TryRead(out var msg))
+                    if (msg?.Items != null && msg.Items.Count > 0)
                     {
-                        if (null != msg && null != msg.Items)
+                        var items = msg.Items;
+                        for (int i = 0; i < items.Count; i += batchSize)
                         {
-                            _server.UpdateNodes(msg.Items);
+                            var batch = items.Skip(i).Take(batchSize).ToList();
+                            _server.UpdateNodes(batch);
                         }
                     }
                 }
             });
-            _task.Start();
+
         }
 
+        [Benchmark]
         public void Start()
         {
             if (Running)
@@ -162,6 +188,7 @@ namespace neuserver
             }
         }
 
+        [Benchmark]
         public void Stop()
         {
             if (Running)

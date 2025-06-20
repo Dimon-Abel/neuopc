@@ -6,11 +6,13 @@ using Opc.Ua.Server;
 using OpcRcw.Da;
 using Serilog;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Channels;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace neuopc
@@ -27,22 +29,24 @@ namespace neuopc
 
     internal class Client
     {
-        private static readonly int MaxReadCount = 100;
+        private static readonly int MaxReadCount = 500;
         private static DaClient _client = null;
         private static bool _clientRunning = false;
         private static bool _momitor = true;
-        private static int _sleepTime = 1500;
+        private static int _sleepTime = 3000;
         private static Thread _clientThread = null;
         private static Dictionary<string, NodeInfo> _infoMap = null;
         private static Channel<Msg> _dataChannel = null;
         private static Action<IEnumerable<NodeInfo>> _action;
         private static Action<IEnumerable<Item>> _monitorAction;
+        private static Queue<List<Item>> _queue = new Queue<List<Item>>();
+        private static ConcurrentDictionary<string, Item> _itemList = new ConcurrentDictionary<string, Item>();
 
         public static void SetMonitor(bool enable, Action<IEnumerable<Item>> action)
         {
             _momitor = enable;
             _monitorAction = action;
-            _sleepTime = 3000;
+            _sleepTime = 1500;
         }
 
         public static IEnumerable<Node> AllItemNode(Opc.Da.Server server)
@@ -124,7 +128,7 @@ namespace neuopc
 
                 var nodes = _momitor ?
                     _infoMap.Values.Where(x => !x.Subscribed).Skip(i * 1).Take(1) :
-                    _infoMap.Values.Skip(i * 1).Take(MaxReadCount);
+                    _infoMap.Values.Skip(i * MaxReadCount).Take(MaxReadCount);
 
                 //var nodes = _infoMap.Values;
                 var tags = nodes?.Select(n => n.Node.ItemName).ToList();
@@ -173,9 +177,10 @@ namespace neuopc
                     };
 
                     list.Add(it);
+                    _queue.Enqueue(list);
                 }
 
-                _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
+                //_dataChannel.Writer.TryWrite(new Msg() { Items = list });
             }
 
             //Log.Information($"_action: {_action?.GetHashCode()}");
@@ -209,7 +214,15 @@ namespace neuopc
                     .Skip(i * MaxReadCount)
                     .Take(MaxReadCount);
 
+                if (nodes.Count() == 0)
+                    continue;
+
                 var tags = nodes?.Select(n => n.Node.ItemName).ToList();
+
+                foreach (var node in nodes)
+                {
+                    node.Subscribed = true;
+                }
 
                 //Log.Information($"tags --- : {JsonConvert.SerializeObject(tags)}");
 
@@ -230,10 +243,12 @@ namespace neuopc
                             return;
                         }
 
-                        var list = new List<Item>();
+                        var list = new List<Item>(dic.Count);
                         foreach (var kv in dic)
                         {
-                            var info = _infoMap[kv.Key];
+                            if (!_infoMap.TryGetValue(kv.Key, out var info))
+                                continue;
+
                             info.Node.Item = kv.Value;
                             info.Subscribed = true;
 
@@ -246,12 +261,32 @@ namespace neuopc
                                 Timestamp = kv.Value.SourceTimestamp,
                             };
 
-                            list.Add(it);
+                            if (_itemList.TryGetValue(kv.Key, out var item))
+                            {
+                                if (item.Value != it.Value || item.Quality != it.Quality || item.Type != it.Type)
+                                {
+                                    list.Add(it);
+                                    _itemList.Remove(kv.Key, out var itt);
+                                    _itemList.TryAdd(kv.Key, it);
+                                }
+                            }
+                            else
+                            {
+                                _itemList.TryAdd(kv.Key, it);
+                                list.Add(it);
+                            }
+
+                            //list.Add(it);
                         }
 
-                        Log.Information($"list.count: {list.Count}");
+                        Log.Information($"list: {list.Count}");
 
-                        _dataChannel.Writer.TryWrite(new Msg() { Items = list, });
+                        _queue.Enqueue(list);
+
+                        //Log.Information($"list.count: {list.Count}");
+
+
+                        //_dataChannel.Writer.TryWrite(new Msg() { Items = list, });
 
                         //if (_monitorAction != null)
                         //{
@@ -263,6 +298,36 @@ namespace neuopc
             }
 
             Log.Information($"MonitorTags end");
+        }
+
+        private static void QueueThread(CancellationTokenSource cancellationTokenSource)
+        {
+            Log.Information($"QueueThread --- start");
+
+            while (true)
+            {
+                if (!_clientRunning)
+                {
+                    cancellationTokenSource.Cancel();
+                }
+
+                try
+                {
+                    if (_queue.TryDequeue(out var it))
+                    {
+                        _dataChannel.Writer.TryWrite(new Msg() { Items = it });
+                    }
+                    else
+                    {
+                        Thread.Sleep(1500);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    cancellationTokenSource.Cancel();
+                    Log.Error(ex, $"QueueThread");
+                }
+            }
         }
 
         private static void ClientThread()
@@ -425,7 +490,7 @@ namespace neuopc
                     return;
                 }
 
-                
+
                 //if (action != null)
                 //{
                 //    _action = action;
@@ -440,6 +505,12 @@ namespace neuopc
                 _dataChannel = dataChannel;
                 _clientThread = new Thread(new ThreadStart(ClientThread));
                 _clientThread.Start();
+
+                var cts = new CancellationTokenSource();
+                Task.Run(() =>
+                {
+                    QueueThread(cts);
+                }, cts.Token);
             }
             catch (Exception ex)
             {
