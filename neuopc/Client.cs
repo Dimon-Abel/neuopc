@@ -174,6 +174,7 @@ namespace neuopc
                         Value = node.Node.Item.Value,
                         Quality = node.Node.Item.Quality,
                         Timestamp = node.Node.Item.SourceTimestamp,
+                        AllCount = count
                     };
 
                     list.Add(it);
@@ -259,6 +260,7 @@ namespace neuopc
                                 Value = kv.Value.Value,
                                 Quality = kv.Value.Quality,
                                 Timestamp = kv.Value.SourceTimestamp,
+                                AllCount = count
                             };
 
                             if (_itemList.TryGetValue(kv.Key, out var item))

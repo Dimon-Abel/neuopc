@@ -54,6 +54,8 @@ namespace neulib
         public dynamic Value { get; set; }
         public Quality Quality { get; set; }
         public DateTime Timestamp { get; set; }
+
+        public int? AllCount { get; set; }
     }
 
 
